@@ -116,3 +116,19 @@ __Importante__
   # Procederemos a linkear
   ld -m elf_i386 <file>.o -s -o <nombre-binario>
 ```
+## Segmentos de memoria ##
+El modelo de memoria segmentada divide la memoria del sistema en grupos de segmentos independientes referenciados por punteros ubicados en el registro de segmento. Cada segmento se utiliza para contener un tipo de dato específico. Un segmento se utiliza para contener códigos de instrucciones, otro segmento almacena los elementos de datos y un tercer segmento mantiene la pila del programa.
+
+Entonces:
+*__Segmento de datos:__
+** Es representado por _.data_ y por _.bss_.
+*** La sección _.data_ se utiliza para declarar la región de memoria, donde los elementos datos se almacenan para el programa.
+**** Esta sección no se puede expandir después de que se declaran los elementos de datos y permanece estática en todo el programa.
+*** La sección _.bss_ también es una sección de memoria estática que contiene buffers para que los datos se declaren más tarde en el programa.
+**** Esta memoria intermedia esta llena de ceros.
+*__Segmento de código:__
+** Es representado por _.text_.
+*** Esto define un área en la memoria que almacena los códigos de instrucción.
+**** Esta también es un área fija.
+*__Pila__
+** Este segmento contiene valores de datos pasados a funciones y procedimientos dentro del programa.
