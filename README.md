@@ -45,3 +45,74 @@ __Ejemplo__
 ```nasm
   add eaxm ebx  ; adds ebx a eax
 ```
+## Declaración de Lenguaje Ensamblador ##
+Los programas en lenguaje ensamblador constan de tres tipos de declaraciones
+* Instrucciones o instrucciones ejecutables
+* Directivas de ensamblador o pseudo-operaciones
+* Macros
+
+__Las Intrucciones ejecutables o simples Instrucciones__ le dicen al procesador que hacer. Cada instrucción consiste de un código de operación (opcode). Cada instrucción ejecutable genera una instrucción en lenguaje máquina.
+
+__Las directivas de ensamblador o pseudo-operaciones__ le da información al ensamblador sobre los diversos aspectos del proceso de esamblaje. Estos no son ejecutables y no generan instrucciones en lenguaje máquina.
+
+__Macros__ son básicamente un mecanismo de sustitución de texto.
+
+## Sintaxis de declaraciones en Lenguaje Ensamblador ##
+El formato del lenguaje es el siguiente:
+```nasm
+  [etiqueta]  menmonic  [orandos] [;comentarios]
+```
+Los campos en el corchetes son opcionales. Una instrucción básica tiene dos partes, la primera es el nombre de la instrucción (o la mnemonic), la cual se va a ejecutar, y la segunda son los operandos o los parametros del comando.
+
+Siguiendo la receta de cocina, el ejemplo:
+```nasm
+  INC COUNT           ; Incrementa la variable de memoria COUNT
+
+  MOV TOTAL, 48       ; Transfiere el valor 48 en la variable 
+                      ; de memoria
+
+  ADD AH, BH          ; Add el contenido de el registro BH
+                      ; al registro AH
+
+  AND MASK1, 128      ; Realiza la operación and en la
+                      ; variable MASK y 128
+
+  ADD MARKS, 10       ; Add 10 a la variable MARK
+
+  MOV AL, 10          ; Transfiere el valor 10 al registro AL
+```
+
+## Hola mundo ##
+Un ejemplo claro del lenguaje ensamblador es el clasico Hola mundo:
+```nasm
+  section .text
+    global _start     ; Debe ser usado para linkear el archivo
+
+  _start:               ; Le dice a ld el punto de entrada
+    mov     edx,len     ; Tamanio del mensaje
+    mov     ecx,msg     ; Mensaje a escribir
+    mov     ebx,1       ; Descriptor de archivo (stdout)
+    mov     eax,4       ; Callsystem number (sys_write)
+    int     0x80        ; Call kernel
+
+    mov     eax,1       ; Callsystem number (sys_exit)
+    int     0x80        ; Call kernel
+  section .data
+  msg db  "Hello, World!", 0xa  ; String de salida
+  len equ $ - msg               ; Tamanio del string
+```
+
+## Compilar y linkear un programa Ensamblador en NASM ##
+A continuación te muestro como se guarda un archivo en Nasm y como linkear el archivo para este se vuelva un binario
+
+__Importante__
+* El archivo de nasm es generalmente almacenado o guardado con la extensión .asm
+* Verificar si el cursor/posición de la terminal es donde esta el archivo asm
+* Para compilar se puede hacer lo siguiente:
+```bash
+  # Linux
+  nasm -f elf <file>.asm
+  # Salida de <file>.o
+  # Procederemos a linkear
+  ld -m elf_i386 <file>.o -s -o <nombre-binario>
+```
