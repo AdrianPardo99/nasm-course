@@ -120,6 +120,7 @@ __Importante__
 El modelo de memoria segmentada divide la memoria del sistema en grupos de segmentos independientes referenciados por punteros ubicados en el registro de segmento. Cada segmento se utiliza para contener un tipo de dato específico. Un segmento se utiliza para contener códigos de instrucciones, otro segmento almacena los elementos de datos y un tercer segmento mantiene la pila del programa.
 
 Entonces:
+
 *__Segmento de datos:__
 ** Es representado por _.data_ y por _.bss_.
 *** La sección _.data_ se utiliza para declarar la región de memoria, donde los elementos datos se almacenan para el programa.
