@@ -68,7 +68,7 @@ Siguiendo la receta de cocina, el ejemplo:
 ```nasm
   INC COUNT           ; Incrementa la variable de memoria COUNT
 
-  MOV TOTAL, 48       ; Transfiere el valor 48 en la variable 
+  MOV TOTAL, 48       ; Transfiere el valor 48 en la variable
                       ; de memoria
 
   ADD AH, BH          ; Add el contenido de el registro BH
@@ -86,7 +86,7 @@ Siguiendo la receta de cocina, el ejemplo:
 Un ejemplo claro del lenguaje ensamblador es el clasico Hola mundo:
 ```nasm
   section .text
-    global _start     ; Debe ser usado para linkear el archivo
+    global _start       ; Debe ser usado para linkear el archivo
 
   _start:               ; Le dice a ld el punto de entrada
     mov     edx,len     ; Tamanio del mensaje
