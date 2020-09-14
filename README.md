@@ -133,3 +133,9 @@ Entonces:
       * Esta también es un área fija.
 * __Pila__
   * Este segmento contiene valores de datos pasados a funciones y procedimientos dentro del programa.
+## Registros ##
+El hecho de que se puedan realizar operaciones en el procesador implica el realizar un procesamiento de los datos. Estos datos ocasionalmente se pueden almacenar en memoria y se puede acceder a ellos desde un registro. Sin embargo, leer datos y almacenarlos en la memoria ralentiza el procesador, ya que implica procesos complicados de enviar la solicitud a través del bus de control y obtener los datos a través del mismo canal.
+
+Para optimizar las operaciones del procesador, el mismo incluye algunas regiones de almacenamiento, llamados registros.
+
+Los registros almacenan datos para su procesamiento sin tener que acceder a la memoria. El chip del procesador incorpora un número limitado de registros.
