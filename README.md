@@ -122,14 +122,14 @@ El modelo de memoria segmentada divide la memoria del sistema en grupos de segme
 Entonces:
 
 * __Segmento de datos:__
-** Es representado por _.data_ y por _.bss_.
-*** La sección _.data_ se utiliza para declarar la región de memoria, donde los elementos datos se almacenan para el programa.
-**** Esta sección no se puede expandir después de que se declaran los elementos de datos y permanece estática en todo el programa.
-*** La sección _.bss_ también es una sección de memoria estática que contiene buffers para que los datos se declaren más tarde en el programa.
-**** Esta memoria intermedia esta llena de ceros.
+  * Es representado por _.data_ y por _.bss_.
+    * La sección _.data_ se utiliza para declarar la región de memoria, donde los elementos datos se almacenan para el programa.
+      * Esta sección no se puede expandir después de que se declaran los elementos de datos y permanece estática en todo el programa.
+    * La sección _.bss_ también es una sección de memoria estática que contiene buffers para que los datos se declaren más tarde en el programa.
+      * Esta memoria intermedia esta llena de ceros.
 * __Segmento de código:__
-** Es representado por _.text_.
-*** Esto define un área en la memoria que almacena los códigos de instrucción.
-**** Esta también es un área fija.
+  * Es representado por _.text_.
+    * Esto define un área en la memoria que almacena los códigos de instrucción.
+      * Esta también es un área fija.
 * __Pila__
-** Este segmento contiene valores de datos pasados a funciones y procedimientos dentro del programa.
+  * Este segmento contiene valores de datos pasados a funciones y procedimientos dentro del programa.
