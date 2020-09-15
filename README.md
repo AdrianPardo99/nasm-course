@@ -180,10 +180,13 @@ El registro de apuntadores son registros de 32 bits son:
 * __EIP__
 * __ESP__
 * __EBP__
+
 Y los registros correspondientes a 16 bits son:
+
 * __IP__
 * __SP__
 * __BP__
+
 De los cuales hay tres categorías de registros de apuntadores, los cuales son:
 * __Apuntador de Instrucciones__ _Instruction Pointer (IP)_ El registro _IP_ de 16 bits almacena la dirección de desplazamiento de la siguiente instrucción que se ejecutara. _IP_ en asociación con el registro _CS_ (como _CS_: _IP_) proporciona la dirección completa de la instrucción actual en el segmento de código.
 * __Apuntador de Pila__ _Stack Pointer (SP)_ El registro _SP_ de 16 bits provee el valor dentro de la pila de programa. _SP_ en asociación con el registro _SS_ (SS: SP) se refiere a la posición actual de los datos o la dirección dentro de la pila de programa.
@@ -193,9 +196,11 @@ De los cuales hay tres categorías de registros de apuntadores, los cuales son:
 Los registros de índice 32 bits son:
 * __ESI__
 * __EDI__
+
 Y los registros correspondientes a 16 bits son:
 * __SI__
 * __DI__
+
 Son utilizados para un direccionamiento indexado y ocasionalmente se utiliza para para sumar y restar. Existen dos conjuntos de apuntadores de índice.
 * __Índice de Origen__ _Source Index (SI)_ Se utilizan como índice de origen para una operación de cadenas.
 * __Índice de Destino__ _Destination Index (DI)_ Se utilizan como índice de destino para una operación de cadenas.
@@ -227,6 +232,7 @@ Los segmentos son áreas específicas en un programa para contener datos, códig
 * __Segmento de Código__ Contiene todas las instrucciones a ejecutar. Un registro de segmento de código de 16 bits o registro _CS_ almacena la dirección de inicio del segmento de código.
 * __Segmento de Datos__ Contiene datos, constantes y áreas de trabajo. Un registro segmento de datos de 16 bits o registro _DS_ almacena la dirección de inicio del segmento de datos.
 * __Segmento de Pila__ Contiene los datos y el retorno de direcciones de procedimientos o subrutinas. Se implementa como la estructura de datos Pila _(LIFO Last Input First Output)_.
+
 Además de los registros DS, CS y SS, existen otros registros de segmento extra: ES (segmento extra), FS y GS, que proporcionan segmentos adicionales para almacenar datos.
 
 __Un ejemplo de uso de registros en general puede ser el siguiente:__
