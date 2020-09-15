@@ -259,3 +259,86 @@ __Un ejemplo de uso de registros en general puede ser el siguiente:__
     len equ $ - msg                   ; Tamanio de msg
     s2  times 9 db  "*"               ; 9 veces *
 ```
+## Llamadas al Sistema ##
+Ahora bien el saber y conocer acerca de algunas llamadas al sistemas. Estas llamadas siguen diversos pasos necesarios para poder escribir, leer, abrir o cerrar descriptores de archivos.
+
+__Pasos a seguir para realizar llamadas a sistema__
+* Poner el número de la llamada al sistema en el registro _EAX_.
+* Almacena los argumentos de la llamada al sistema con los registros _EBX_, _ECX_, etc.
+* Llama la interrupción de sistema _0x80_.
+* El valor de retorno es almacenado generalmente en el registro _EAX_.
+
+Las llamadas al sistema utilizan seis registros que almacenan los argumentos. Estos son _EBX_, _ECX_, _EDX_, _ESI_, _EDI_ y _EBP_. Estos registros toman un argumento consecutivo, es decir, al inicio _EAX_ obtiene la llamada a sistema de lo que necesita ejecutar el programa, consecutivamente obtiene el argumento _EBX_, posteriormente si hay más argumentos se sigue consecutivamente a _ECX_ y así hasta _EDI_.
+
+__Ejemplo de la llamada sys\_exit__
+```nasm
+  mov eax,  1         ; Callsystem (sys_exit)
+  int 0x80            ; Call kernel
+```
+__Ejempo de la llamada sys\_write__
+```nasm
+  mov edx,  4         ; Tamanio del mensaje
+  mov ecx,  msg       ; Mensaje
+  mov ebx,  1         ; Descriptor de archivo (stdout)
+  mov eax,  4         ; Callsystem (sys_write)
+  int 0x80            ; Call kernel
+```
+Todas las llamadas al sistema se enumeran en _/usr/include/asm/unistd.h_ junto a su valor numérico, este valor se pone en el registro _EAX_, la estructura es la siguiente:
+
+| _EAX_ | Nombre    | _EBX_ | _ECX_ | _EDX_ | _ESX_ | _EDI_ |
+| ----- | ------    | ----- | ----- | ----- | ----- | ----- |
+|   1   | sys\_exit | int   |       |       |       |       |
+|   2   | sys\_fork | struct pt_reg |       |       |       |       |
+|   3   | sys\_read | unsigned int | char * | size_t |   |   |
+|   4   | sys\_write | unsigned int | const char * | size_t |   |   |
+|   5   | sys\_open | const char * | int | int |    |    |
+|   6   | sys\_close | int   |       |       |       |       |
+
+__Ejemplo de uso de llamadas al sistema__
+```nasm
+  section .data
+    usrMsg  db  "Por favor ingresa un número: "     ; Mensaje 1
+    lUsr  equ $-usrMsg                              ; Tamanio de mensaje 1
+    dispMsg db  "Número ingresado: "                ; Mensaje 2
+    lDisp equ $-dispMsg                             ; Tamanio de mensaje 2
+
+  section .bss                                      ; Variables
+    num resb  5
+
+  section .text
+    global _start
+
+  _start:
+  ; Para escribir seguiremos la receta de sys_write, tipo_salida(stdout), cons_char*, size_t
+    mov eax,  4                                     ; sys_write
+    mov ebx,  1                                     ; stdout
+    mov ecx,  usrMsg                                ; Mensaje
+    mov edx,  lUsr                                  ; Tamanio mensaje
+    int 0x80                                        ; Call kernel
+
+  ; Almacenaremos la lectura de teclado.
+    mov eax,  3                                     ; sys_read
+    mov ebx,  2                                     ; stdin
+    mov ecx,  num                                   ; Lectura en num
+    mov edx,  5                                     ; 5 bytes 1 de signo
+    int 0x80                                        ; Call kernel
+
+  ; Mostrar el segundo mensaje
+    mov eax,  4                                     ; sys_write
+    mov ebx,  1                                     ; stdout
+    mov ecx,  dispMsg                               ; Mensaje
+    mov edx,  lDisp                                 ; Tamanio mensaje
+    int 0x80                                        ; Call kernel
+
+  ; Mostrar el valor de lectura
+    mov eax,  4                                     ; sys_write
+    mov ebx,  1                                     ; stdout
+    mov ecx,  num                                   ; Mensaje
+    mov edx,  5                                     ; Tamanio mensaje
+    int 0x80                                        ; Call kernel
+
+  ; Salida del programa correctamente 0
+    mov eax,  1                                     ; sys_exit
+    mov ebx,  0                                     ; exit 0;
+    int 0x80
+```
