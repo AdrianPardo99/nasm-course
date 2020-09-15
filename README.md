@@ -139,3 +139,117 @@ El hecho de que se puedan realizar operaciones en el procesador implica el reali
 Para optimizar las operaciones del procesador, el mismo incluye algunas regiones de almacenamiento, llamados registros.
 
 Los registros almacenan datos para su procesamiento sin tener que acceder a la memoria. El chip del procesador incorpora un número limitado de registros.
+
+Existen 10 registros de procesador de 32 bits y 6 registros en la arquitectura IA-32. Estos registros están agrupados de la siguiente manera:
+
+* Registros Generales.
+  * Registros de Datos.
+  * Registros de Apuntadores.
+  * Registros de Índice.
+* Registros de Control.
+* Registros de Segmento.
+
+### Registros de Datos ###
+4 Registros de 32 bits son usados para Aritmética, Lógica y otras operaciones. Esos registros de 32 bits pueden ser usados de 3 maneras:
+* Como un registro datos completo de 32 bits:
+  * __EAX__
+  * __EBX__
+  * __ECX__
+  * __EDX__
+* Como registro a la mitad de capacidad, es decir 16 bits:
+  * __AX__
+  * __BX__
+  * __CX__
+  * __DX__
+* Como registros de 6 bits:
+  * __AH__
+  * __AL__
+  * __BH__
+  * __BL__
+  * __CH__
+  * __CL__
+  * __DH__
+  * __DL__
+Por lo que estos registros cuentan con un propósito especifico que es el siguiente:
+* __AX__ siendo el acumulador primario, es usado en entrada/salida y en operaciones aritméticas. Un ejemplo de esto es realizar la operación Multiplicación que va a a ser almacenada en el registro _EAX_, _AX_ o _AL_ de acuerdo al tamaño de la operación.
+* __BX__ es conocido como el registro base, ya que puede utilizarse para usar direccionamiento indexado.
+* __CX__ es conocido como el registro contador, ya que los registros _ECX_, _CX_ almacenan el contador para bucles en operaciones iterativas.
+* __DX__ es conocido como el registro de datos. También se utiliza en operaciones de entrada/salida.También se usa con el registro _AX_ junto con _DX_ para multiplicar y dividir operaciones que involucran valores grandes.
+### Registros de Apuntadores ###
+El registro de apuntadores son registros de 32 bits son:
+* __EIP__
+* __ESP__
+* __EBP__
+Y los registros correspondientes a 16 bits son:
+* __IP__
+* __SP__
+* __BP__
+De los cuales hay tres categorías de registros de apuntadores, los cuales son:
+* __Apuntador de Instrucciones__ _Instruction Pointer (IP)_ El registro _IP_ de 16 bits almacena la dirección de desplazamiento de la siguiente instrucción que se ejecutara. _IP_ en asociación con el registro _CS_ (como _CS_: _IP_) proporciona la dirección completa de la instrucción actual en el segmento de código.
+* __Apuntador de Pila__ _Stack Pointer (SP)_ El registro _SP_ de 16 bits provee el valor dentro de la pila de programa. _SP_ en asociación con el registro _SS_ (SS: SP) se refiere a la posición actual de los datos o la dirección dentro de la pila de programa.
+* __Apuntador de Base__ _Base Pointer (BP)_ El registro _BS_ de 16 bits ayuda principalmente a hacer referencia a las variables de parámetro que se pasan a subrutina. La dirección en el registro _SS_ se combina con el desplazamiento en _BP_ para obtener la ubicación del parámetro. _BP_ también se puede combinar con los registros _DI_, _SI_ como registro base para direccionamiento especial.
+
+### Registros de Índice ###
+Los registros de índice 32 bits son:
+* __ESI__
+* __EDI__
+Y los registros correspondientes a 16 bits son:
+* __SI__
+* __DI__
+Son utilizados para un direccionamiento indexado y ocasionalmente se utiliza para para sumar y restar. Existen dos conjuntos de apuntadores de índice.
+* __Índice de Origen__ _Source Index (SI)_ Se utilizan como índice de origen para una operación de cadenas.
+* __Índice de Destino__ _Destination Index (DI)_ Se utilizan como índice de destino para una operación de cadenas.
+### Registro de Control ###
+El registro de apuntador de instrucción de 32 bits y el registro de banderas de 32 bits combinados se consideran registros de control.
+
+Muchas instrucciones implican comparaciones y cálculos matemáticos y cambian el estado de las banderas y algunas otras instrucciones condicionales prueban el valor de estos indicadores de estado para llevar el flujo de control a otra ubicación.
+
+Los bits de banderas más comunes es:
+* __Bandera de Desbordamiento__ _Overflow Flag (OF)_ Indica que alguna operación aritmética supero los limites numéricos de lo cual seria superar el límite del bit más a la izquierda.
+* __Bandera de Dirección__ _Direction Flag (DF)_ Determina la dirección para mover o evaluar datos de cadenas.
+  * _DF=0_ La dirección de la cadena es de izquierda a derecha.
+  * _DF=1_ La dirección de la cadena es de derecha a izquierda.
+* __Bandera de Interrupción__ _Interruption Flag (IF)_ Determina si las interrupciones externas, como la entrada del teclado, u otras, deben ignorarse o procesarse. Deshabilita la interrupción externa cuando el valor es 0 y habilita las interrupciones cuando se establece en 1.
+* __Bandera de Trampa__ _Tramp Flag (TF)_ Permite configurar el funcionamiento del procesador en modo de un solo paso. El programa DEBUG que usamos establece la bandera de trampa, por lo que podríamos recorrer la ejecución una instrucción a la vez.
+* __Bandera de Signo__ _Sing Flag (SF)_ Estable el signo de una operación aritmética dado por el bit a la izquierda (bit más significativo) por lo que _0_ es un valor positivo y _1_ es un valor negativo.
+* __Bandera Cero__ _Zero Flag (ZF)_ Esta bandera lo único que busca es encenderse en caso de que el resultado aritmetico sea cero _0_ es un valor cuyo resultado no es cero, _1_ es un valor cuyo resultado es cero.
+* __Bandera Auxiliar de Acarreo__ _Auxiliary Carry Flag (AF)_ Contiene el acarreo del bit 3 al bit 4 después de una operación aritmética; utilizado para aritmética especializada. El AF se establece cuando una operación aritmética de 1 byte provoca un acarreo del bit 3 al bit 4.
+* __Bandera de Paridad__ _Parity Flag (PF)_ Indica el número total de 1-bits en el resultado obtenido de una operación aritmética. Indica _1_ si es impar y _0_ si es par.
+* __Bandera de Acarreo__ _Carry Flag (CF)_ Contiene el acarreo de 0 o 1 de un bit (bit más significativo) después de una operación aritmética. También almacena el contenido del último bit de una operación de cambio o rotación.
+
+La tabla quedaría representada como:
+
+| Bandera       |    |    |    |    | O  | D  | I | T | S | Z |   | A |   | P |   | C |
+| ------------- | -- | -- | -- | -- | -- | -- | - | - | - | - | - | - | - | - | - | - |
+| Número de bit | 15 | 14 | 13 | 12 | 11 | 10 | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+### Registros de Segmento ###
+Los segmentos son áreas específicas en un programa para contener datos, código y pila. Hay tres segmentos principales:
+* __Segmento de Código__ Contiene todas las instrucciones a ejecutar. Un registro de segmento de código de 16 bits o registro _CS_ almacena la dirección de inicio del segmento de código.
+* __Segmento de Datos__ Contiene datos, constantes y áreas de trabajo. Un registro segmento de datos de 16 bits o registro _DS_ almacena la dirección de inicio del segmento de datos.
+* __Segmento de Pila__ Contiene los datos y el retorno de direcciones de procedimientos o subrutinas. Se implementa como la estructura de datos Pila _(LIFO Last Input First Output)_.
+Además de los registros DS, CS y SS, existen otros registros de segmento extra: ES (segmento extra), FS y GS, que proporcionan segmentos adicionales para almacenar datos.
+
+__Un ejemplo de uso de registros en general puede ser el siguiente:__
+```nasm
+  section .text
+    global _start                 ; Comienzo del header para linkear y funcione
+
+  _start:                         ; Inicio
+    mov edx,  len                 ; Tamanio de la salida
+    mov ecx,  msg                 ; Mensaje a escribir
+    mov ebx,  1                   ; Descriptor de archivo (stdout)
+    mov eax,  4                   ; Callsystem (sys_write)
+    int 0x80                      ; Call kernel
+
+    mov edx,  9                   ; Tamanio de la salida
+    mov ecx,  s2                  ; Mensaje a escribir
+    mov ebx,  1                   ; Descriptor de archivo (stdout)
+    mov eax,  4                   ; Callsystem (sys_write)
+    int 0x80                      ; Call kernel
+    mov     eax,1                 ; Callsystem number (sys_exit)
+    int     0x80                  ; Call kernel
+  section .data
+    msg db  "Display 9 estrellas",0xa ; Mensaje
+    len equ $ - msg                   ; Tamanio de msg
+    s2  times 9 db  "*"               ; 9 veces *
+```
