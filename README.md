@@ -342,3 +342,12 @@ __Ejemplo de uso de llamadas al sistema__
     mov ebx,  0                                     ; exit 0;
     int 0x80
 ```
+## Modos de direccionamiento ##
+La mayoría de las instrucciones requieren que se procesen operandos. Una dirección de operando proporciona la ubicación, donde se almacenan los datos a procesar. Algunas instrucciones no requieren un operando, mientras que otras instrucciones pueden requerir uno, dos o tres operandos.
+
+Cuando una instrucción requiere dos operandos, el primer operando es generalmente el destino, que contiene datos en un registro o ubicación de memoria y el segundo operando es la fuente. La fuente contiene los datos a entregar (__direccionamiento inmediato__) o la dirección (__en el registro o en la memoria__) de los datos. Generalmente, los datos de origen permanecen inalterados después de la operación.
+
+Existen 3 modos de direccionamiento:
+* __Registro de Direcciones__
+* __Direccionamiento Inmediato__
+* __Direccionamiento de Memoria__
