@@ -275,7 +275,7 @@ __Ejemplo de la llamada sys\_exit__
   mov eax,  1         ; Callsystem (sys_exit)
   int 0x80            ; Call kernel
 ```
-__Ejempo de la llamada sys\_write__
+__Ejemplo de la llamada sys\_write__
 ```nasm
   mov edx,  4         ; Tamanio del mensaje
   mov ecx,  msg       ; Mensaje
@@ -351,3 +351,120 @@ Existen 3 modos de direccionamiento:
 * __Registro de Direcciones__
 * __Direccionamiento Inmediato__
 * __Direccionamiento de Memoria__
+
+### Direccionamiento Inmediato ###
+Una operando inmediato tiene un valor constante o una expresión. Cuando una instrucción con dos operandos usa direccionamiento inmediato, el primer operando puede ser un registro o una ubicación de memoria, y el segundo operando es una constante inmediata. El primer operando define la longitud de los datos.
+
+__Ejemplo:__
+```nasm
+  BYTE_VALUE  bd  150 ; Un byte definido
+  WORD_VALUE  bd  300 ; Una palabra definida
+  ADD BYTE_VALUE, 65  ; Un operando inmediato de suma
+  MOV AX, 0x45        ; Constante inmediata 0x45 es transferida a AX
+```
+### Direccionamiento de Memoria (Directo) ###
+Cuando los operandos se especifican en el modo de direccionamiento de memoria, se requiere acceso directo a la memoria principal, generalmente al segmento de datos. Esta forma de abordar da como resultado un procesamiento de datos más lento. Para localizar la ubicación exacta de los datos en la memoria, necesitamos la dirección de inicio del segmento, que normalmente se encuentra en el registro __DS__ y un valor de compensación. Este valor de compensación también se denomina dirección efectiva.
+
+En el direccionamiento de memoria directo, uno de los operandos se refiere a una ubicación de memoria y el otro operando hace referencia a un registro.
+
+__Ejemplo:__
+```nasm
+  ADD BYTE_VALUE, DL  ; Agrega el registro en la ubicación de la memoria
+  MOV BX, BYTE_VALUE  ; El operando de la memoria se agrega al registro
+```
+#### Direccionamiento de Compensación (Directa) ####
+Este modo de direccionamiento utiliza los operadores aritméticos para modificar una dirección. Por ejemplo, observe las siguientes definiciones que definen tablas de datos:
+
+__Ejemplo:__
+```nasm
+  BYTE_TABLE  db  14, 15, 22, 45      ; Tabla de bytes
+  WORD_TABLE  db  134, 345, 564, 123  ; Tabla de palabras
+```
+Las siguientes operaciones acceden a los datos de las tablas en la memoria en registros:
+__Ejemplo:__
+```nasm
+  MOV CL, BYTE_TABLE[2]	  ; Obtiene el 3er elemento de la tabla de bytes
+  MOV CL, BYTE_TABLE + 2	; Obtiene el 3er elemento de la tabla de bytes
+  MOV CX, WORD_TABLE[3]	  ; Obtiene el 4to elemento de la tabla de palabras
+  MOV CX, WORD_TABLE + 3	; Obtiene el 4to elemento de la tabla de palabras
+```
+### Direccionamiento de Memoria (Indirecto) ###
+Este modo de direccionamiento utiliza la capacidad de la computadora de Segmento: direccionamiento de compensación . Generalmente, los registros base __EBX__, __EBP__ (o __BX__, __BP__) y los registros de índice (__DI__, __SI__), codificados entre corchetes para referencias de memoria, se utilizan para este propósito.
+
+El direccionamiento indirecto se usa generalmente para variables que contienen varios elementos como matrices. La dirección de inicio de la matriz se almacena, digamos, en el registro __EBX__.
+
+El siguiente fragmento de código muestra cómo acceder a diferentes elementos de la variable.
+__Ejemplo__
+```nasm
+  MY_TABLE TIMES 10 DW 0  ; Aloja 10 pabras de 2 bytes cada una inicializada con 0
+  MOV EBX, [MY_TABLE]     ; Direccionamiento efectivo de MY_TABLE a EBX
+  MOV [EBX], 110          ; MY_TABLE[0] = 110
+  ADD EBX, 2              ; EBX = EBX +2
+  MOV [EBX], 123          ; MY_TABLE[1] = 123
+```
+### Instrucción MOV ###
+__MOV__ se utiliza para mover datos de un espacio de almacenamiento a otro.
+
+__Ejemplo:__
+```nasm
+  ; Estructura.
+  MOV destino,  fuente
+```
+__Esta instrucción tiene las siguientes estructuras.__
+```nasm
+  MOV registro,  registro
+  MOV registro,  valor-inmediato
+  MOV memoria,   valor-inmediato
+  MOV registro,  memoria
+  MOV memoria,   registro
+```
+Destaquemos lo siguiente:
+* Ambos operandos de _MOV_ deben ser del mismo tamaño
+* El valor del operando fuente permanece sin cambios
+
+En algunas ocasiones _MOV_ puede tener algunas ambigüedades, las cuales se pueden solucionarse si se usa un formato especifico de convención o el siguiente:
+```nasm
+  MOV  EBX, [MY_TABLE]  ; EBX=MY_TABLE[0]
+  MOV  [EBX], 110	      ; MY_TABLE[0] = 110
+```
+No está claro si desea mover un equivalente en bytes o un equivalente en palabra del número 110. En tales casos, es aconsejable utilizar un especificador de tipo.
+
+La siguiente tabla muestra algunos de los especificadores de tipo comunes:
+| Especificador de tipo | Bytes |
+| --------------------- | ----- |
+|          BYTE         |   1   |
+|          WORD         |   2   |
+|         DWORD         |   4   |
+|         QWORD         |   8   |
+|         TBYTE         |  10   |
+
+Un ejemplo de esta sección es la siguiente:
+```nasm
+  section .text
+    global  _start
+
+  _start:
+    ; Escritura de Luis Slobotzky
+    mov eax,  4
+    mov ebx,  1
+    mov ecx,  msg
+    mov edx,  lMsg
+    int 0x80
+
+    mov [msg],  dword "Jose"
+
+    ; Escritura de Jose Slobotzky
+    mov eax,  4
+    mov ebx,  1
+    mov ecx,  msg
+    mov edx,  lMsg
+    int 0x80
+
+    mov eax,  1
+    mov ebx,  0
+    int 0x80
+
+  section .data
+    msg db  "Luis Slobotzky ",0xA
+    lMsg  equ $-msg
+```
