@@ -468,3 +468,93 @@ Un ejemplo de esta sección es la siguiente:
     msg db  "Luis Slobotzky ",0xA
     lMsg  equ $-msg
 ```
+## Variables ##
+NASM proporciona varias directivas definidas para reservar espacio de almacenamiento para variables. La directiva define ensamblador se utiliza para la asignación de espacio de almacenamiento. Se puede utilizar para reservar e inicializar uno o más bytes.
+
+### Asignación de espacio de almacenamiento para datos inicializados ###
+La sintaxis de la declaración de asignación de almacenamiento para datos inicializados es:
+```nasm
+  [variable]    directiva-definicion    valor-inicial   [,valor-inicial]...
+```
+Donde, variable es el identificador de cada espacio de almacenamiento. El ensamblador asocia un valor de compensación para cada nombre de variable definido en el segmento de datos.
+
+Hay cinco formas básicas de la directiva define:
+
+| Directiva | Propósito de definición | Bytes |
+| --------- | ----------------------- | ----- |
+|    DB     |         Bytes           |   1   |
+|    DW     |         Palabras        |   2   |
+|    DD     |       Palabra Doble     |   4   |
+|    DQ     |       Palabra Cuádruple |   8   |
+|    TB     |     Diez Bytes          |  10   |
+__Ejemplo__
+```nasm
+  selection   DB  'y'
+  numero		  DW  12345
+  nNumero	    DW  -12345
+  numeroG	    DQ  123456789
+  real1	      DD  1.234
+  real2	      DQ  123.456
+```
+Tenemos que considerar lo siguiente:
+* Cada byte de carácter se almacena como su valor ASCII en hexadecimal. (Limite de 1 byte es hasta 0xFF)
+* Cada valor decimal se convierte automáticamente a su equivalente binario de 16 bits y se almacena como un número hexadecimal.
+* El procesador utiliza el orden de bytes little-endian.
+* Los números negativos se convierten a su representación en complemento a 2
+* Los números de coma flotante cortos y largos se representan utilizando 32 o 64 bits, respectivamente.
+### Asignación de espacio de almacenamiento para datos no inicializados ###
+Las directivas de reserva se utilizan para reservar espacio para datos no inicializados. Las directivas de reserva toman un solo operando que especifica el número de unidades de espacio que se reservarán. Cada define-directive tiene una reserve-directive relacionada.
+
+Hay cinco formas básicas de la directiva de reserva:
+| Directiva | Propósito de definición |
+| --------- | ----------------------- |
+|    RESB   |           Bytes         |
+|    RESW   |           Palabras      |
+|    RESD   |       Palabra Doble     |
+|    RESQ   |       Palabra Cuadruple |
+|    REST   |        10 Bytes         |
+
+### Múltiples definiciones ###
+Puede tener varias declaraciones de definición de datos en un programa.
+
+__Ejemplo__
+```nasm
+  desc      DB  'Y'       ; ASCII de y = 0x79
+  number1   DW  12345     ; 12345D = 0x3039
+  number2   DD  12345679  ; 123456789D = 0x75BCD15
+```
+El ensamblador asigna memoria contigua para múltiples definiciones de variables.
+### Múltiples inicializaciones ###
+La directiva __TIMES__ permite múltiples inicializaciones con el mismo valor. Por ejemplo, una matriz denominada marcas de tamaño 9 se puede definir e inicializar a cero utilizando la siguiente declaración:
+
+__Ejemplo__
+```nasm
+  marks  TIMES  9  DW  0
+```
+La directiva _TIMES_ es útil para definir matrices y tablas. El siguiente programa muestra 9 asteriscos en la pantalla:
+```nasm
+  section .data
+    stars   times 9 db '*'
+    lstars  equ $-stars
+    endl  db  0x0A
+
+  section	.text
+    global  _start:
+
+  _start:
+    mov eax,  4
+    mov ebx,  1
+    mov ecx,  stars
+    mov edx,  lstars
+    int 0x80
+
+    mov eax,  4
+    mov ebx,  1
+    mov ecx,  endl
+    mov edx,  1
+    int 0x80
+
+    mov eax,  1
+    mov ebx,  0
+    int 0x80
+```
