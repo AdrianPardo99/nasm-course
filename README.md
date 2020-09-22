@@ -10,11 +10,11 @@ Un programa de ensamblador es dividido en tres secciones
 * Sección bss
 * Sección text
 
-### Seccion data ###
+### Sección data ###
 
 Es usado para declarar constantes o datos inicializados. Estos datos no cambian durante la ejecución. Se puede declarar varios valores constantes, nombre de archivo, tamaño de un buffer, entre otras cosas.
 
-La sintaxis para declarar la seccion de data es:
+La sintaxis para declarar la sección de data es:
 ```nasm
   section.data
 ```
@@ -22,14 +22,14 @@ La sintaxis para declarar la seccion de data es:
 
 Es usado para declarar variables.
 
-La sintaxis para declarar la seccion de bss es:
+La sintaxis para declarar la sección de bss es:
 ```nasm
   section.bss
 ```
 ### Sección text ###
 Es usado para guardar el código actual. Esa sección debe comenzar con la declaración __global _start__, la cual le dice al kernel donde comienza la ejecución del programa.
 
-La sintaxis para declarar la seccion de text es:
+La sintaxis para declarar la sección de text es:
 ```nasm
   section.text
     global _start
@@ -558,3 +558,105 @@ La directiva _TIMES_ es útil para definir matrices y tablas. El siguiente progr
     mov ebx,  0
     int 0x80
 ```
+## Constantes ##
+El ensamblador de NASM tiene la utilidad de crear y definir constantes las cuales son utilizadas en la escritura de programas, por ello existen tres distintas formas las cuales son llamadas por disintas directivas del lenguaje siendo las siguientes:
+* __EQU__
+* __\%assing__
+* __\%define__
+
+### Directiva EQU ###
+La directiva _EQU_ es usada para definir constantes las cuales comúnmente contienen números enteros.
+
+__Estructura__
+```nasm
+  constant_name equ expresion-value
+```
+__Ejemplo__
+```nasm
+  total_muestra equ 100
+```
+Lo cual podemos usar este bloque de código de la siguiente forma:
+```nasm
+  mov ecx,  total_muestra
+  cmp eax,  total_muestra
+```
+Otra forma de aplicar la directiva de _EQU_ es:
+```nasm
+  tam   equ 20
+  largo equ 10
+  area  equ tam*largo
+```
+Lo cual puede servir mucho para saber que _area_ contendrá un valor de 200.
+
+__Un ejemplo programado puede ser el siguiente:__
+```nasm
+  section .data
+    ; Definimos las salidas del programa std_out, std_in,
+    ; sys_write, sys_exit
+    stdout    equ 1
+    stdin     equ 0
+    sys_exit  equ 1
+    sys_write equ 4
+
+    ; Otros valores
+    msg1  db  "Hola, saludos!",0x0A
+    lmsg1 equ $-msg1
+    msg2  db  "Bienvenido al mundo de",0x0A
+    lmsg2 equ $-msg2
+    msg3  db  "la programación en ensamblador desde Linux!",0x0A
+    lmsg3 equ $-msg3
+  section .text
+    global  _start
+
+  _start:
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg1
+    mov edx,  lmsg1
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg2
+    mov edx,  lmsg2
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg3
+    mov edx,  lmsg3
+    int 0x80
+
+    mov eax,  sys_exit
+    mov ebx,  0
+    int 0x80
+```
+### Directiva \%assing ###
+Parecida a _EQU_ para definir un valor numérico, pero a diferencia de _EQU_, esta directiva permite realizar redefinición de los valores más adelante.
+
+__Estructura__
+```nasm
+  %assing cons_name value
+```
+__Ejemplo__
+```nasm
+  %assing total 10
+```
+Más tarde durante la ejecución podremos modificarlo:
+```nasm
+  %assing total 20
+```
+_Nota:_ Esta directiva es sensitiva a mayúsculas y minúsculas.
+### Directiva \%define ###
+La directiva permite definir tanto constantes numéricas como de cadenas de caracteres. Esta directiva es similar a \#define en C.
+__Estructura__
+```nasm
+  %define var_name  value
+```
+__Por ejemplo, puede definir la constante PTR como:__
+```nasm
+  %define PTR [EBP+4]
+```
+_Importante respecto al ejemplo y al código de ejemplo:_
+* El código anterior reemplaza PTR por [EBP + 4].
+* Esta directiva también permite la redefinición y distingue entre mayúsculas y minúsculas.
