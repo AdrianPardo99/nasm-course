@@ -649,6 +649,7 @@ Más tarde durante la ejecución podremos modificarlo:
 _Nota:_ Esta directiva es sensitiva a mayúsculas y minúsculas.
 ### Directiva \%define ###
 La directiva permite definir tanto constantes numéricas como de cadenas de caracteres. Esta directiva es similar a \#define en C.
+
 __Estructura__
 ```nasm
   %define var_name  value
