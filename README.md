@@ -16,7 +16,7 @@ Es usado para declarar constantes o datos inicializados. Estos datos no cambian 
 
 La sintaxis para declarar la sección de data es:
 ```nasm
-  section.data
+  section .data
 ```
 ### Sección bss ###
 
@@ -24,14 +24,14 @@ Es usado para declarar variables.
 
 La sintaxis para declarar la sección de bss es:
 ```nasm
-  section.bss
+  section .bss
 ```
 ### Sección text ###
 Es usado para guardar el código actual. Esa sección debe comenzar con la declaración __global _start__, la cual le dice al kernel donde comienza la ejecución del programa.
 
 La sintaxis para declarar la sección de text es:
 ```nasm
-  section.text
+  section .text
     global _start
   _start:
 ```
@@ -689,11 +689,11 @@ __Estructura__
 Mismo caso que _INC_ el operando _destino_ puede ser de 8 bits, 16 bits o 32 bits.
 __Ejemplo__
 ```nasm
-  segment .data
+  section .data
     coun  dw  0
     value dw  15
 
-  segment .text
+  section .text
     inc [coun]
     dec [value]
 
@@ -727,7 +727,7 @@ __Ejemplo__
   ; respectivamente, sumará los valores, almacenará
   ; el resultado en una ubicación de memoria 'res'
   ; y finalmente mostrará el resultado.
-  segment .data
+  section .data
     ; Definimos las salidas del programa std_out, std_in,
     ; sys_write, sys_exit, sys_read
     stdout    equ 1
@@ -746,12 +746,12 @@ __Ejemplo__
     msg3  db  "La suma es: "
     lmsg3 equ $-msg3
 
-  segment .bss
+  section .bss
     n1  resb  2
     n2  resb  2
     r   resb  1
 
-  segment .text
+  section .text
     global  _start
 
   _start:
@@ -808,6 +808,255 @@ __Ejemplo__
     mov ebx,  stdout
     mov ecx,  r
     mov edx,  1
+    int 0x80
+
+    mov eax,  sys_exit
+    mov ebx,  0
+    int 0x80
+```
+### Instrucción MUL e IMUL ###
+Hay dos instrucciones para multiplicar datos binarios. La instrucción _MUL_ (Multiplicar) maneja datos sin firmar y la _IMUL_ (Multiplicar enteros) maneja datos firmados. Ambas instrucciones afectan a la bandera de transporte y desbordamiento.
+
+__Estructura__
+```nasm
+  MUL   multiplicador
+  IMUL  multiplicador
+```
+Multiplicando en ambos casos estará en un acumulador, dependiendo del tamaño del multiplicando y el multiplicador y el producto generado también se almacena en dos registros dependiendo del tamaño de los operandos. La siguiente sección explica las instrucciones _MUL_ con tres casos diferentes
+
+1. __Cuando se multiplican dos bytes:__ El multiplicando está en el registro _AL_ y el multiplicador es un byte en la memoria o en otro registro. El producto está en _AX_. Los 8 bits de orden superior del producto se almacenan en _AH_ y los 8 bits de orden inferior se almacenan en _AL_.
+![primera-aritmetica](./imgsReadme/arithmetic1.jpg)
+2. __Cuando se multiplican dos valores de una palabra:__ El multiplicando debe estar en el registro _AX_ y el multiplicador es una palabra en la memoria u otro registro. Por ejemplo, para una instrucción como _MUL_ _DX_, debe almacenar el multiplicador en _DX_ y el multiplicando en _AX_. El producto resultante es una palabra doble, que necesitará dos registros. La parte de orden superior (más a la izquierda) se almacena en _DX_ y la parte de orden inferior (más a la derecha) se almacena en _AX_.
+![segunda-aritmetica](./imgsReadme/arithmetic2.jpg)
+3. __Cuando se multiplican dos valores de palabras dobles:__ Cuando se multiplican dos valores de dos palabras, el multiplicando debe estar en _EAX_ y el multiplicador es un valor de dos palabras almacenado en la memoria o en otro registro. El producto generado se almacena en los registros _EDX_: _EAX_, es decir, los 32 bits de orden superior se almacenan en el registro _EDX_ y los 32 bits de orden inferior se almacenan en el registro _EAX_.
+![tercera-aritmetica](./imgsReadme/arithmetic3.jpg)
+
+__Ejemplo explicito__
+```nasm
+  MOV AL, 10
+  MOV DL, 25
+  MUL DL
+  ...
+  MOV DL, 0FFH	; DL= -1
+  MOV AL, 0BEH	; AL = -66
+  IMUL DL
+```
+__Ejemplo__
+```nasm
+  section .data
+    ; Definimos las salidas del programa std_out,
+    ; sys_write, sys_exit,
+    stdout    equ 1
+    sys_exit  equ 1
+    sys_write equ 4
+    msg1  db  "Primer valor: "
+    lmsg1 equ $-msg1
+
+    msg2  db  "Segundo valor: "
+    lmsg2 equ $-msg2
+
+    msg3  db  "La multiplicación es: "
+    lmsg3 equ $-msg3
+
+    endl  db  0xA
+    lndl  equ $-endl
+
+    n1    db  '3'
+    ln1   equ $-n1
+
+    n2    db  '2'
+    ln2   equ $-n2
+
+  section .bss
+    r resb  1
+
+  section .text
+    global  _start
+
+  _start:
+    mov al, '3'
+    sub al, '0'
+
+    mov bl, '2'
+    sub bl, '0'
+
+    mul bl
+    add al, '0'
+
+    mov [r],  al
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg1
+    mov edx,  lmsg1
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  n1
+    mov edx,  ln1
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  endl
+    mov edx,  lndl
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg2
+    mov edx,  lmsg2
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  n2
+    mov edx,  ln2
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  endl
+    mov edx,  lndl
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg3
+    mov edx,  lmsg3
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  r
+    mov edx,  1
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  endl
+    mov edx,  lndl
+    int 0x80
+
+    mov eax,  sys_exit
+    mov ebx,  0
+    int 0x80
+```
+### Instrucción DIV e IDIV ###
+La operación de división genera dos elementos: un _cociente_ y un _residuo_. En caso de multiplicación, no se produce un desbordamiento porque se utilizan registros de doble longitud para mantener el producto. Sin embargo, en caso de división, puede producirse un desbordamiento. El procesador genera una interrupción si se produce un desbordamiento.
+
+La instrucción _DIV_ (Divide) se usa para datos sin firmar y el _IDIV_ (Integer Divide) se usa para datos firmados.
+
+__Estructura__
+```nasm
+  DIV   divisor
+  IDIV  divisor
+```
+El dividendo está en un acumulador. Ambas instrucciones pueden funcionar con operandos de 8, 16 o 32 bits. La operación afecta a los seis indicadores de estado. La siguiente sección explica tres casos de división con diferente tamaño de operando.
+1. __Cuando el divisor es de 1 byte:__ Se supone que el dividendo está en el registro _AX_ (16 bits). Después de la división, el cociente va al registro _AL_ y el resto al registro _AH_.
+![cuarta-aritmetica](./imgsReadme/arithmetic4.jpg)
+2. __Cuando el divisor es 1 palabra:__ Se supone que el dividendo tiene una longitud de 32 bits y está en los registros _DX_: _AX_. Los 16 bits de orden superior están en _DX_ y los 16 bits de orden inferior están en _AX_. Después de la división, el cociente de 16 bits va al registro _AX_ y el resto de 16 bits al registro _DX_.
+![quinta-aritmetica](./imgsReadme/arithmetic5.jpg)
+3. __Cuando el divisor es doble palabra:__ Se supone que el dividendo tiene una longitud de 64 bits y está en los registros _EDX_: _EAX_. Los 32 bits de orden superior están en _EDX_ y los 32 bits de orden inferior están en _EAX_. Después de la división, el cociente de 32 bits va al registro _EAX_ y el resto de 32 bits va al registro _EDX_.
+![sexta-aritmetica](./imgsReadme/arithmetic6.jpg)
+
+__Ejemplo__
+```nasm
+  section .data
+    ; Definimos las salidas del programa std_out,
+    ; sys_write, sys_exit,
+    stdout    equ 1
+    sys_exit  equ 1
+    sys_write equ 4
+    msg1  db  "Primer valor: "
+    lmsg1 equ $-msg1
+
+    msg2  db  "Segundo valor: "
+    lmsg2 equ $-msg2
+
+    msg3  db  "La división es: "
+    lmsg3 equ $-msg3
+
+    endl  db  0xA
+    lndl  equ $-endl
+
+    n1    db  '8'
+    ln1   equ $-n1
+
+    n2    db  '2'
+    ln2   equ $-n2
+
+  section .bss
+    r resb  1
+
+  section .text
+    global  _start
+
+  _start:
+    mov al, '8'
+    sub al, '0'
+
+    mov bl, '2'
+    sub bl, '0'
+
+    div bl
+    add ax, '0'
+
+    mov [r],  al
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg1
+    mov edx,  lmsg1
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  n1
+    mov edx,  ln1
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  endl
+    mov edx,  lndl
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg2
+    mov edx,  lmsg2
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  n2
+    mov edx,  ln2
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  endl
+    mov edx,  lndl
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg3
+    mov edx,  lmsg3
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  r
+    mov edx,  1
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  endl
+    mov edx,  lndl
     int 0x80
 
     mov eax,  sys_exit
