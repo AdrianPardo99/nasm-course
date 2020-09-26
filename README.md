@@ -659,5 +659,158 @@ __Por ejemplo, puede definir la constante PTR como:__
   %define PTR [EBP+4]
 ```
 _Importante respecto al ejemplo y al código de ejemplo:_
-* El código anterior reemplaza PTR por [EBP + 4].
+* El código anterior reemplaza _PTR_ por [_EBP_ + 4].
 * Esta directiva también permite la redefinición y distingue entre mayúsculas y minúsculas.
+
+## Instrucciones Aritméticas ##
+Estas instrucciones te permiten manipular operaciones en los registros y variables dependiendo el caso, por otro lado esto nos permite realizar operaciones las cuales ayudan a solucionar 1 o más problemas, sea el curioso ejemplo de una calculadora.
+
+### Instrucción INC ###
+La instrucción _INC_ se utiliza para incrementar un operando en uno. Funciona en un solo operando que puede estar en un registro o en la memoria.
+
+__Estructura__
+```nasm
+  INC destino
+```
+El operando _destino_ puede ser de 8 bits, 16 bits o 32 bits.
+__Ejemplo__
+```nasm
+  INC EBX   ; Incremento del registro de 32 bits
+  INC DL    ; Incremento del registro de 8 bits
+  INC [con] ; Incremento de la variable con
+```
+### Instrucción DEC ###
+La instrucción _DEC_ se utiliza para reducir un operando en uno. Funciona en un solo operando que puede estar en un registro o en la memoria.
+
+__Estructura__
+```nasm
+  DEC destino
+```
+Mismo caso que _INC_ el operando _destino_ puede ser de 8 bits, 16 bits o 32 bits.
+__Ejemplo__
+```nasm
+  segment .data
+    coun  dw  0
+    value dw  15
+
+  segment .text
+    inc [coun]
+    dec [value]
+
+    mov ebx,  coun
+    inc word  [ebx]
+
+    mov esi,  value
+    dec byte  [esi]
+```
+### Instrucción ADD y SUB ###
+Las instrucciones _ADD_ y _SUB_ se utilizan para realizar una simple suma / resta de datos binarios en tamaño de byte, palabra y palabra doble, es decir, para sumar o restar operandos de 8, 16 o 32 bits, respectivamente.
+
+__Estructura__
+```nasm
+  ADD destino,  fuente
+  SUB destino,  fuente
+```
+Estas dos instrucciones pueden tener lugar entre:
+* Registro a registro.
+* Memoria a registro.
+* Registro a memoria.
+* Registro a dato/valor constante.
+* Memoria a dato/valor constante.
+
+Sin embargo, al igual que otras instrucciones, las operaciones de memoria a memoria no son posibles utilizando las instrucciones _ADD_ o _SUB_. Una operación de estas dos instrucciones establece o borra las banderas de desbordamiento y acarreo.
+
+__Ejemplo__
+```nasm
+  ; El siguiente ejemplo pedirá dos dígitos al usuario,
+  ; almacenará los dígitos en el registro EAX y EBX,
+  ; respectivamente, sumará los valores, almacenará
+  ; el resultado en una ubicación de memoria 'res'
+  ; y finalmente mostrará el resultado.
+  segment .data
+    ; Definimos las salidas del programa std_out, std_in,
+    ; sys_write, sys_exit, sys_read
+    stdout    equ 1
+    stdin     equ 0
+    sys_exit  equ 1
+    sys_write equ 4
+    sys_read  equ 3
+
+    ; Otros valores constantes seran
+    msg1  db  "Ingresa los primeros digitos: "
+    lmsg1 equ $-msg1
+
+    msg2  db  "Ingresa los siguientes digitos: "
+    lmsg2 equ $-msg2
+
+    msg3  db  "La suma es: "
+    lmsg3 equ $-msg3
+
+  segment .bss
+    n1  resb  2
+    n2  resb  2
+    r   resb  1
+
+  segment .text
+    global  _start
+
+  _start:
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg1
+    mov edx,  lmsg1
+    int 0x80
+
+    mov eax,  sys_read
+    mov ebx,  stdin
+    mov ecx,  n1
+    mov edx,  2
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg2
+    mov edx,  lmsg2
+    int 0x80
+
+    mov eax,  sys_read
+    mov ebx,  stdin
+    mov ecx,  n2
+    mov edx,  2
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg3
+    mov edx,  lmsg3
+    int 0x80
+
+    ; Primero usaremos mov para cada numero, despues
+    ; Substraeremos el valor ascii '0' para convertir a decimal
+
+    mov eax,  [n1]
+    sub eax,  '0'
+
+    mov ebx,  [n2]
+    sub ebx,  '0'
+
+    ; Despues haremos add eax, ebx
+    add eax,  ebx
+
+    ; Sumaremos '0'
+    add eax,  '0'
+
+    ; Almacenaremos en r
+    mov [r],  eax
+
+    ; Imprimiremos la suma:
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  r
+    mov edx,  1
+    int 0x80
+
+    mov eax,  sys_exit
+    mov ebx,  0
+    int 0x80
+```
