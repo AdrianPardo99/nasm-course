@@ -825,10 +825,13 @@ __Estructura__
 Multiplicando en ambos casos estará en un acumulador, dependiendo del tamaño del multiplicando y el multiplicador y el producto generado también se almacena en dos registros dependiendo del tamaño de los operandos. La siguiente sección explica las instrucciones _MUL_ con tres casos diferentes
 
 1. __Cuando se multiplican dos bytes:__ El multiplicando está en el registro _AL_ y el multiplicador es un byte en la memoria o en otro registro. El producto está en _AX_. Los 8 bits de orden superior del producto se almacenan en _AH_ y los 8 bits de orden inferior se almacenan en _AL_.
+
 ![primera-aritmetica](./imgsReadme/arithmetic1.jpg)
 2. __Cuando se multiplican dos valores de una palabra:__ El multiplicando debe estar en el registro _AX_ y el multiplicador es una palabra en la memoria u otro registro. Por ejemplo, para una instrucción como _MUL_ _DX_, debe almacenar el multiplicador en _DX_ y el multiplicando en _AX_. El producto resultante es una palabra doble, que necesitará dos registros. La parte de orden superior (más a la izquierda) se almacena en _DX_ y la parte de orden inferior (más a la derecha) se almacena en _AX_.
+
 ![segunda-aritmetica](./imgsReadme/arithmetic2.jpg)
 3. __Cuando se multiplican dos valores de palabras dobles:__ Cuando se multiplican dos valores de dos palabras, el multiplicando debe estar en _EAX_ y el multiplicador es un valor de dos palabras almacenado en la memoria o en otro registro. El producto generado se almacena en los registros _EDX_: _EAX_, es decir, los 32 bits de orden superior se almacenan en el registro _EDX_ y los 32 bits de orden inferior se almacenan en el registro _EAX_.
+
 ![tercera-aritmetica](./imgsReadme/arithmetic3.jpg)
 
 __Ejemplo explicito__
@@ -955,10 +958,13 @@ __Estructura__
 ```
 El dividendo está en un acumulador. Ambas instrucciones pueden funcionar con operandos de 8, 16 o 32 bits. La operación afecta a los seis indicadores de estado. La siguiente sección explica tres casos de división con diferente tamaño de operando.
 1. __Cuando el divisor es de 1 byte:__ Se supone que el dividendo está en el registro _AX_ (16 bits). Después de la división, el cociente va al registro _AL_ y el resto al registro _AH_.
+
 ![cuarta-aritmetica](./imgsReadme/arithmetic4.jpg)
 2. __Cuando el divisor es 1 palabra:__ Se supone que el dividendo tiene una longitud de 32 bits y está en los registros _DX_: _AX_. Los 16 bits de orden superior están en _DX_ y los 16 bits de orden inferior están en _AX_. Después de la división, el cociente de 16 bits va al registro _AX_ y el resto de 16 bits al registro _DX_.
+
 ![quinta-aritmetica](./imgsReadme/arithmetic5.jpg)
 3. __Cuando el divisor es doble palabra:__ Se supone que el dividendo tiene una longitud de 64 bits y está en los registros _EDX_: _EAX_. Los 32 bits de orden superior están en _EDX_ y los 32 bits de orden inferior están en _EAX_. Después de la división, el cociente de 32 bits va al registro _EAX_ y el resto de 32 bits va al registro _EDX_.
+
 ![sexta-aritmetica](./imgsReadme/arithmetic6.jpg)
 
 __Ejemplo__
