@@ -3,7 +3,7 @@
 ; respectivamente, sumará los valores, almacenará
 ; el resultado en una ubicación de memoria 'res'
 ; y finalmente mostrará el resultado.
-segment .data
+section .data
   ; Definimos las salidas del programa std_out, std_in,
   ; sys_write, sys_exit, sys_read
   stdout    equ 1
@@ -22,12 +22,12 @@ segment .data
   msg3  db  "La suma es: "
   lmsg3 equ $-msg3
 
-segment .bss
+section .bss
   n1  resb  2
   n2  resb  2
   r   resb  1
 
-segment .text
+section .text
   global  _start
 
 _start:
