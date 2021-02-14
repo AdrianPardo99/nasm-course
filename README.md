@@ -1073,3 +1073,123 @@ __Ejemplo__
     mov ebx,  0
     int 0x80
 ```
+## Instrucciones Lógicas ##
+El mismo procesador _x86_ que nos provee un set de instrucciones aritméticas, este igual nos puede proveer instrucciones que trabajan a nivel de bits y están son el set de instrucciones lógicas, las cuales son las siguientes:
+| Instrucción | Formato |
+| ----------- | ------- |
+| _AND_       | _AND_ operando1, operando2 |
+| _OR_        | _OR_ operando1, operando2 |
+| _XOR_       | _XOR_ operando1, operando2 |
+| _TEST_      | _TEST_ operando1, operando2 |
+| _NOT_       | _NOT_ operando1 |
+
+El primer operando en todos los casos podría estar en registro o en memoria. El segundo operando podría estar en el registro / memoria o en un valor inmediato (constante). Sin embargo, las operaciones de memoria a memoria no son posibles. Estas instrucciones comparan o hacen coincidir bits de los operandos y establecen las banderas _CF_, _OF_, _PF_, _SF_ y _ZF_.
+
+### Instrucción AND ###
+Al igual que un sistema digital esta realiza la operación bit a bit y después este almacena su resultado en el primer registro de la operación:
+| Operandos | Valor en decimal | Valor binario |
+| --------- | ---------------- | ------------- |
+| Operando1 | 5                | 0101 |
+| Operando2 | 3                | 0011 |
+| Operando1 | 1                | 0001 |
+Como podemos ver que al final de la operación el Operando1 en este caso podemos pensar en algún registro, es modificado de modo en que ahí se almacena los datos de la operación final.
+
+
+Otros usos de la misma instrucción AND para la eliminación de bits o algunas otras operaciones, por ejemplo tenemos un valor N representado con la secuencia _xxxx xxxx_ y queremos comprobar si ese mismo valor es un valor potencia de <img src="https://render.githubusercontent.com/render/math?math=2^{M}"> donde _M_ es el valor entero de los bits que usa dicho valor, para ello podremos hacer lo siguiente
+```nasm
+  ; Ya con todo lo demas de los global previamente colocados
+  mov al, 0x8
+  mov bl, 0x8
+  sub bl, 0x1
+  and al, bl
+  ; Por lo que sabemos que al hacer esta operacion obtendremos
+  ; 0 si el valor de N es una potencia de 2 por ejemplo este caso
+```
+Aplicando esta idea en registros y programado el programa quedaría como el siguiente:
+```nasm
+  ; El siguiente ejemplo pedirá un dígito al usuario,
+  ; almacenará los dígitos en el registro EAX y EBX,
+  ; respectivamente, and a los valores, almacenará
+  ; el resultado en una ubicación de memoria 'res'
+  ; y finalmente mostrará el resultado.
+  section .data
+    ; Definimos las salidas del programa std_out, std_in,
+    ; sys_write, sys_exit, sys_read
+    stdout    equ 1
+    stdin     equ 0
+    sys_exit  equ 1
+    sys_write equ 4
+    sys_read  equ 3
+
+    ; Otros valores constantes seran
+    msg1  db  "Ingresa el primer digito: "
+    lmsg1 equ $-msg1
+
+    msg3  db  "Es un valor potencia 2: "
+    lmsg3 equ $-msg3
+
+    msg2 db   0x0A,"Si es un valor 0 es un valor potencia 2",0x0A
+    lmsg2 equ $-msg2
+
+  section .bss
+    n1  resb  2
+    r   resb  1
+
+  section .text
+    global  _start
+
+  _start:
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg1
+    mov edx,  lmsg1
+    int 0x80
+
+    mov eax,  sys_read
+    mov ebx,  stdin
+    mov ecx,  n1
+    mov edx,  2
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg3
+    mov edx,  lmsg3
+    int 0x80
+
+    ; Primero usaremos mov para cada numero, despues
+    ; Substraeremos el valor ascii '0' para convertir a decimal
+
+    mov eax,  [n1]
+    sub eax,  '0'
+
+    mov ebx,  [n1]
+    sub ebx,  '0'
+    sub ebx, 0x01
+
+    ; Despues haremos and eax, ebx
+    and eax,  ebx
+
+    ; Sumaremos '0'
+    add eax,  '0'
+
+    ; Almacenaremos en r
+    mov [r],  eax
+
+    ; Imprimiremos la operación and:
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  r
+    mov edx,  1
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg2
+    mov edx,  lmsg2
+    int 0x80
+
+    mov eax,  sys_exit
+    mov ebx,  0
+    int 0x80
+```
