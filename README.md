@@ -43,7 +43,7 @@ Si bien esto puede ser o no relevante el como escribir comentarios en Nasm, es i
 ```
 __Ejemplo__
 ```nasm
-  add eaxm ebx  ; adds ebx a eax
+  add eax ebx  ; adds ebx a eax
 ```
 ## Declaración de Lenguaje Ensamblador ##
 Los programas en lenguaje ensamblador constan de tres tipos de declaraciones
@@ -60,9 +60,9 @@ __Macros__ son básicamente un mecanismo de sustitución de texto.
 ## Sintaxis de declaraciones en Lenguaje Ensamblador ##
 El formato del lenguaje es el siguiente:
 ```nasm
-  [etiqueta]  menmonic  [orandos] [;comentarios]
+  [etiqueta]  menmonic  [operandos] [;comentarios]
 ```
-Los campos en el corchetes son opcionales. Una instrucción básica tiene dos partes, la primera es el nombre de la instrucción (o la mnemonic), la cual se va a ejecutar, y la segunda son los operandos o los parametros del comando.
+Los campos en el corchetes son opcionales. Una instrucción básica tiene dos partes, la primera es el nombre de la instrucción (o la menmonic), la cual se va a ejecutar, y la segunda son los operandos o los parametros del comando.
 
 Siguiendo la receta de cocina, el ejemplo:
 ```nasm
@@ -1092,6 +1092,7 @@ Al igual que un sistema digital esta realiza la operación bit a bit y después 
 | Operando1 | 5                | 0101 |
 | Operando2 | 3                | 0011 |
 | Operando1 | 1                | 0001 |
+
 Como podemos ver que al final de la operación el Operando1 en este caso podemos pensar en algún registro, es modificado de modo en que ahí se almacena los datos de la operación final.
 
 
@@ -1102,7 +1103,7 @@ Otros usos de la misma instrucción AND para la eliminación de bits o algunas o
   mov bl, 0x8
   sub bl, 0x1
   and al, bl
-  ; Por lo que sabemos que al hacer esta operacion obtendremos
+  ; Por lo que sabemos que al hacer esta operación obtendremos
   ; 0 si el valor de N es una potencia de 2 por ejemplo este caso
 ```
 Aplicando esta idea en registros y programado el programa quedaría como el siguiente:
@@ -1193,3 +1194,33 @@ Aplicando esta idea en registros y programado el programa quedaría como el sigu
     mov ebx,  0
     int 0x80
 ```
+### Intrucciones OR, XOR, NOT
+Para el caso de estas operaciones realizan las mismas operaciones bit a bit en las cuales el _operando1_ es el que se ve modificado de acuerdo a lo que este pueda necesitar.
+
+__OR__
+```nasm
+  mov eax,  0x05
+  mov ebx,  0x02
+  or  eax,  ebx
+  ; Resultado de la operación:
+  ; 0101 or 0010 = 0111 <=> 7
+```
+__XOR__
+```nasm
+  mov eax,  0x05
+  mov ebx,  0x03
+  xor  eax,  ebx
+  ; Resultado de la operación:
+  ; 0101 xor 0011 = 0100 <=> 4
+```
+__NOT__
+```nasm
+  mov eax,  0x05
+  not eax
+  ; Resultado de la operación
+  ; not 0101 = 1010 <=> 0xFF 0xFF 0xFF 0xFA
+  ;   por el tamaño del registro 32 bits o 4 bytes
+```
+### Instrucción TEST ###
+La instrucción TEST funciona igual que la operación AND, pero a diferencia de la instrucción AND, no cambia el primer operando. Entonces, si necesitamos verificar si un número en un registro es par o impar, también podemos hacerlo usando la instrucción TEST sin cambiar el número original.
+## Condicionales ##
