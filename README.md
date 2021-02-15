@@ -1336,7 +1336,7 @@ __Sintaxis__
   loop etiqueta
 ```
 
-Donde, etiqueta es la etiqueta de destino que identifica la instrucción de destino como en las instrucciones de salto. La instrucción _LOOP_ asume que el registro _ECX_ contiene el recuento de bucles. Cuando se ejecuta la instrucción de bucle, el registro _ECX_ disminuye y el control salta a la etiqueta de destino, hasta que el valor del registro _ECX_, es decir, el contador alcanza el valor cero.
+Donde, __etiqueta__ es la etiqueta de destino que identifica la instrucción de destino como en las instrucciones de salto. La instrucción _LOOP_ asume que el registro _ECX_ contiene el recuento de bucles. Cuando se ejecuta la instrucción de bucle, el registro _ECX_ disminuye y el control salta a la etiqueta de destino, hasta que el valor del registro _ECX_, es decir, el contador alcanza el valor cero.
 
 __Ejemplo__
 ```nasm
