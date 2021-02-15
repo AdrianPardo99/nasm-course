@@ -1541,3 +1541,76 @@ Hay dos instrucciones para procesar estos números:
 * DAS − decimal Adjust After Subtraction
 
 No hay soporte para multiplicación y división en representación BCD empaquetada.
+
+## Strings (Cadenas de texto)
+
+Ya hemos utilizado cadenas de longitud variable en nuestros ejemplos anteriores. Las cadenas de longitud variable pueden tener tantos caracteres como sea necesario. Generalmente, especificamos la longitud de la cadena por cualquiera de las siguientes dos formas:
+
+* Almacenamiento explicito de nuestra cadena de datos
+* Usando un centinela
+
+Podemos almacenar la longitud de la cadena de forma explícita utilizando el símbolo de contador de ubicación $ que representa el valor actual del contador de ubicación.
+__Ejemplo__
+```nasm
+  msg1  db  "Ingresa el primer digito: "
+  lmsg1 equ $-msg1
+```
+Esto tiene un significado sencillo en el que se interpreta como:
+```nasm
+  msg1  db  "Ingresa el primer digito: "
+  lmsg1 equ 26
+```
+Alternativamente, puede almacenar cadenas con un carácter centinela final para delimitar una cadena en lugar de almacenar la longitud de la cadena explícitamente. El carácter centinela debe ser un carácter especial que no aparezca dentro de una cadena.
+
+__Ejemplo__
+```nasm
+  msg1 db "Ingresa el primer digito: ",0
+```
+
+Entonces con esto procederemos a realizar las siguientes operaciones o a su análisis.
+
+### Instrucciones de String
+
+Cada instrucción de cadena puede requerir un operando de origen, un operando de destino o ambos. Para segmentos de 32 bits, las instrucciones de cadena utilizan registros _ESI_ y _EDI_ para apuntar a los operandos de origen y destino, respectivamente.
+
+Sin embargo, para los segmentos de 16 bits, los registros _SI_ y _DI_ se utilizan para apuntar al origen y al destino, respectivamente. Hay cinco instrucciones básicas para procesar cadenas.
+
+* _MOVS_: esta instrucción mueve 1 byte, palabra o palabra doble de datos de una ubicación de memoria a otra.
+* _LODS_: esta instrucción se carga desde la memoria. Si el operando es de un byte, se carga en el registro _AL_, si el operando es una palabra, se carga en el registro _AX_ y se carga una palabra doble en el registro _EAX_.
+* _STOS_: esta instrucción almacena datos del registro (_AL_, _AX_ o _EAX_) en la memoria.
+* _CMPS_: esta instrucción compara dos elementos de datos en la memoria. Los datos pueden tener un tamaño de byte, palabra o palabra doble.
+* _SCAS_: esta instrucción compara el contenido de un registro (_AL_, _AX_ o _EAX_) con el contenido de un elemento en la memoria.
+
+Cada una de las instrucciones anteriores tiene una versión de byte, palabra y palabra doble, y las instrucciones de cadena se pueden repetir utilizando un prefijo de repetición.
+
+Estas instrucciones utilizan el par de registros _ES_: _DI_ y _DS_: _SI_, donde los registros _DI_ y _SI_ contienen direcciones de compensación válidas que se refieren a bytes almacenados en la memoria. _SI_ normalmente está asociado con _DS_ (segmento de datos) y _DI_ siempre está asociado con _ES_ (segmento extra).
+
+Los registros _DS_: _SI_ (o _ESI_) y _ES_: _DI_ (o _EDI_) apuntan a los operandos de origen y destino, respectivamente. Se supone que el operando de origen está en _DS_: _SI_ (o _ESI_) y el operando de destino en _ES_: _DI_ (o _EDI_) en la memoria.
+
+Para direcciones de 16 bits, se utilizan los registros _SI_ y _DI_, y para direcciones de 32 bits, se utilizan los registros _ESI_ y _EDI_.
+
+La siguiente tabla representa la idea:
+
+| Instrucción básica | Operación en | Operación de byte | Operación de palabra | Operación de palabra doble |
+| ------------------ | ------------ | ----------------- | -------------------- | ------------ |
+| _MOVS_ | _ES_:_DI_ / _DS_:_SI_ | _MOVSB_ | _MOVSW_ | _MOVSD_ |
+| _LODS_ | _AX_ / _DS_:_SI_ | _LODSB_ | _LODSW_ | _LODSD_ |
+| _STOS_ | _ES_:_DI_ / _AX_ | _STOSB_ | _STOSW_ | _STOSD_ |
+| _CMPS_ | _DS_:_SI_ / _ES_:_DI_ | _CMPSB_ | _CMPSW_ | _CMPSD_ |
+| _SCAS_ | _ES_:_DI_ / _AX_ | _SCASB_ | _SCASW_ | _SCASD_ |
+
+### Prefijos de repetición
+El prefijo _REP_, cuando se establece antes de una instrucción de cadena, por ejemplo, _REP_ _MOVSB_, provoca la repetición de la instrucción basada en un contador colocado en el registro _CX_. _REP_ ejecuta la instrucción, reduce _CX_ en 1 y comprueba si _CX_ es cero. Repite el procesamiento de la instrucción hasta que _CX_ sea cero.
+
+La bandera de dirección _DF_ determinara la dirección del string:
+
+* Usa _CLD_ (Bandera de dirección clara, _DF_=0) para realizar la operación de izquierda a derecha.
+* Usa _STD_ (Bandera de establecer dirección, DF=1) para realizar la operacion de derecha a izquierda.
+
+El prefijo _REP_ también tiene las siguientes variaciones:
+
+* _REP_: Es la repetición incondicional. Repite la operación hasta que _CX_ sea cero.
+* _REPE_ o _REPZ_: Es repetición condicional. Repite la operación mientras la bandera de cero indica igual / cero. Se detiene cuando _ZF_ indica no igual / cero o cuando _CX_ es cero.
+* _REPNE_ o _REPNZ_: También es repetición condicional. Repite la operación mientras la bandera de cero indica no igual / cero. Se detiene cuando _ZF_ indica igual / cero o cuando _CX_ se reduce a cero.
+
+## Arreglos
