@@ -1319,3 +1319,24 @@ __Las siguientes instrucciones de salto condicional tienen usos especiales y ver
 |   _JNS_       | Salta sino Signo (Valor positivo) | _SF_ |
 
 ## Ciclos ##
+Muchas veces podemos utilizar las instrucciones _JMP_ para realizar diversos ciclos de una condición especifica.
+
+__Ejemplo__
+```nasm
+  mov CL, 10 ; Valor limite
+  L1:
+    ; Cuerpo de todo el código
+    DEC CL  ; Decrementa en 1 el registro CL
+    JNZ L1  ; Verifica si el registro CL es 0
+```
+Pero alternamente el procesador nos otorga una instrucción llamada: _LOOP_ que influye mucho para lo que conocemos como iteración de las instrucciones.
+
+__Sintaxis__
+```nasm
+  loop etiqueta
+```
+
+Donde, etiqueta es la etiqueta de destino que identifica la instrucción de destino como en las instrucciones de salto. La instrucción _LOOP_ asume que el registro _ECX_ contiene el recuento de bucles. Cuando se ejecuta la instrucción de bucle, el registro _ECX_ disminuye y el control salta a la etiqueta de destino, hasta que el valor del registro _ECX_, es decir, el contador alcanza el valor cero.
+
+__Ejemplo__
+```nasm
