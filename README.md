@@ -1224,3 +1224,87 @@ __NOT__
 ### Instrucción TEST ###
 La instrucción TEST funciona igual que la operación AND, pero a diferencia de la instrucción AND, no cambia el primer operando. Entonces, si necesitamos verificar si un número en un registro es par o impar, también podemos hacerlo usando la instrucción TEST sin cambiar el número original.
 ## Condicionales ##
+La ejecución condicional en lenguaje ensamblador se logra mediante varias instrucciones de bucle y ramificación. Estas instrucciones pueden cambiar el flujo de control en un programa. La ejecución condicional se observa en dos escenarios:
+
+| Tipo de condicional | Descripción |
+| ------------------- | ----------- |
+| Salto incondicional | Esto se realiza mediante la instrucción JMP. La ejecución condicional a menudo implica una transferencia de control a la dirección de una instrucción que no sigue la instrucción que se está ejecutando actualmente. La transferencia de control puede ser hacia adelante, para ejecutar un nuevo conjunto de instrucciones o hacia atrás, para volver a ejecutar los mismos pasos. |
+| Salto condicional   | Esto se realiza mediante un conjunto de instrucciones de salto j condición dependiendo de la condición. Las instrucciones condicionales transfieren el control rompiendo el flujo secuencial y lo hacen cambiando el valor de compensación en IP. |
+
+Por ello analizaremos la instrucción CMP.
+### Instrucción CMP ###
+La instrucción CMP compara dos operandos. Generalmente se usa en ejecución condicional. Esta instrucción básicamente resta un operando del otro para comparar si los operandos son iguales o no. No perturba los operandos de origen o destino. Se utiliza junto con la instrucción de salto condicional para la toma de decisiones.
+
+__Sintaxis__
+```nasm
+  cmp destino, fuente
+```
+CMP compara dos campos de datos numéricos. El operando de destino puede estar en el registro o en la memoria. El operando de origen podría ser un registro, memoria o datos constantes (inmediatos).
+__Ejemplo__
+```nasm
+  cmp DX, 00  ; Compara DX con el valor 0
+  JE  L7      ; Si es real, salta a L7
+  ; .
+  ; .
+  ; .
+  L7: ; ...
+```
+CMP se utiliza a menudo para comparar si un valor de contador ha alcanzado el número de veces que se debe ejecutar un bucle. Considere la siguiente condición típica
+```nasm
+  INC	EDX
+  CMP	EDX, 10	; Compara si el valor EDX esta en 10
+  JLE	LP1     ; Si es menor igual a 10, salta a LP1
+```
+### Saltos incondicionales ###
+Como se mencionó anteriormente, esto se realiza mediante la instrucción JMP. La ejecución condicional a menudo implica una transferencia de control a la dirección de una instrucción que no sigue la instrucción que se está ejecutando actualmente. La transferencia de control puede ser hacia adelante, para ejecutar un nuevo conjunto de instrucciones o hacia atrás, para volver a ejecutar los mismos pasos.
+
+__Sintaxis__
+```nasm
+  JMP Etiqueta
+```
+__Ejemplo__
+```nasm
+  L1:
+  ; Código y más código
+  ; .
+  ; .
+  ; .
+  JMP L1
+```
+### Saltos condicionales ###
+Para estos casos el auxiliar _CMP_ puede realizar diversas operaciones de salto, por ello existen las siguientes instrucciones:
+
+__A continuación se muestran las instrucciones de salto condicional que se utilizan en datos con signo utilizados para operaciones aritméticas__
+| Instrucción | Descripción | Banderas |
+| ----------- | ----------- | -------- |
+| _JE_ / _JZ_ | Salta si es igual / Salta si es cero | _ZF_ |
+| _JNE_ / _JNZ_ | Salta si es distinto / Salta si es distinto de cero | _ZF_ |
+| _JG_ / _JNLE_ | Salta si es estrictamente mayor / Salta si no es menor o igual | _OF_, _SF_, _ZF_ |
+| _JGE_ / _JNL_ | Salta si es mayor o igual / Salta si no es estrictamente menor | _OF_, _SF_ |
+| _JL_ / _JNGE_ | Salta si es estrictamente menor / Salta si no es mayor o igual | _OF_, _SF_ |
+| _JLE_ / _JNG_ | Salta si es menor o igual / Salta si no es estrictamente mayor | _OF_, _SF_, _ZF_ |
+
+__A continuación se muestran las instrucciones de salto condicional que se utilizan en datos sin firmar utilizados para operaciones lógicas__
+| Instrucciones | Descripción | Banderas |
+| ------------- | ----------- | -------- |
+| _JE_ / _JZ_ | Salta si es igual / Salta si es cero | _ZF_ |
+| _JNE_ / _JNZ_ | Salta si es distinto / Salta si es distinto de cero | _ZF_ |
+| _JA_ / _JNBE_ | Salta encima / Salta no por debajo o igual | _CF_, _ZF_ |
+| _JAE_ / _JNB_ | Salta encima o igual / Salta no por debajo | _CF_ |
+| _JB_ / _JNAE_ | Salta debajo / Salta no por encima o igual | _CF_ |
+| _JBE_ / _JNA_ | Salta debajo o igual / Salta no por encima | _AF_, _CF_ |
+
+__Las siguientes instrucciones de salto condicional tienen usos especiales y verifican el valor de las banderas__
+| Instrucciones | Descripción | Banderas |
+| ------------- | ----------- | -------- |
+|   _JXCZ_      | Salta si _CX_ es cero | Ninguna |
+|   _JC_        | Salta si Carry        | _CF_ |
+|   _JNC_       | Salta sino Carry      | _CF_ |
+|   _JO_        | Salta si Overflow     | _OF_ |
+|   _JNO_       | Salta sino Overflow   | _OF_ |
+| _JP_ / _JPE_  | Salta si Paridad / Salta si Paridad par | _PF_ |
+| _JNP_ / _JPO_ | Salta si no Paridad / Salta si Paridad impar | _PF_ |
+|   _JS_        | Salta si Signo (Valor negativo) | _SF_ |
+|   _JNS_       | Salta sino Signo (Valor positivo) | _SF_ |
+
+## Ciclos ##
