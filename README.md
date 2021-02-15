@@ -1390,3 +1390,118 @@ l1:
   mov ebx,  0
   int 0x80
 ```
+## Números ##
+Los datos numéricos generalmente se representan en sistema binario. Las instrucciones aritméticas operan sobre datos binarios. Cuando los números se muestran en la pantalla o se ingresan desde el teclado, están en formato ASCII.
+
+Hasta ahora, hemos convertido estos datos de entrada en formato ASCII a binarios para cálculos aritméticos y hemos vuelto a convertir el resultado a binario.
+
+Sin embargo, tales conversiones tienen una sobrecarga y la programación en lenguaje ensamblador permite procesar números de una manera más eficiente, en forma binaria. Los números decimales se pueden representar de dos formas:
+
+* ASCII
+* BCD (Binary Coded Decimal) (Decimal Codificado en Binario)
+
+### Forma ASCII ###
+En la representación ASCII, los números decimales se almacenan como una cadena de caracteres ASCII.
+
+__Ejemplo__
+```nasm
+  1234
+  ; Es equivalente a
+  0x31	0x32	0x33	0x34
+```
+Hay cuatro instrucciones para procesar números en representación ASCII:
+* AAA - Ajuste ASCII después de la adición
+* AAS - Ajuste ASCII después de la sustracción
+* AAM - Ajuste ASCII después de la multiplicación
+* AAD - Ajuste ASCII antes de la división
+
+Para realizar estas operaciones es necesario almacenar los datos en el registro _AL_
+
+Un ejemplo aplicado de esto seria:
+```nasm
+; El siguiente ejemplo pedirá dos dígitos al usuario,
+; respectivamente, restara los valores, almacenará
+; el resultado en una ubicación de memoria 'r'
+; y finalmente mostrará el resultado.
+section .data
+  ; Definimos las salidas del programa std_out, std_in,
+  ; sys_write, sys_exit, sys_read
+  stdout    equ 1
+  stdin     equ 0
+  sys_exit  equ 1
+  sys_write equ 4
+  sys_read  equ 3
+
+  ; Otros valores constantes seran
+  msg1  db  "Ingresa el primer digito: "
+  lmsg1 equ $-msg1
+
+  msg2  db  "Ingresa los siguiente digito: "
+  lmsg2 equ $-msg2
+
+  msg3  db  "La resta es: "
+  lmsg3 equ $-msg3
+
+section .bss
+  n1  resb  2
+  n2  resb  2
+  r   resb  1
+
+section .text
+  global  _start
+
+_start:
+  mov eax,  sys_write
+  mov ebx,  stdout
+  mov ecx,  msg1
+  mov edx,  lmsg1
+  int 0x80
+
+  mov eax,  sys_read
+  mov ebx,  stdin
+  mov ecx,  n1
+  mov edx,  2
+  int 0x80
+
+  mov eax,  sys_write
+  mov ebx,  stdout
+  mov ecx,  msg2
+  mov edx,  lmsg2
+  int 0x80
+
+  mov eax,  sys_read
+  mov ebx,  stdin
+  mov ecx,  n2
+  mov edx,  2
+  int 0x80
+
+  mov eax,  sys_write
+  mov ebx,  stdout
+  mov ecx,  msg3
+  mov edx,  lmsg3
+  int 0x80
+
+  mov al,  [n1]
+
+  mov bl,  [n2]
+  sub al,   bl
+  aas
+  or  al,   0x30
+
+
+  ; Almacenaremos en r
+  mov [r],  ax
+
+  ; Imprimiremos la suma:
+  mov eax,  sys_write
+  mov ebx,  stdout
+  mov ecx,  r
+  mov edx,  1
+  int 0x80
+
+  mov eax,  sys_exit
+  mov ebx,  0
+  int 0x80
+```
+Pero esto solo permite trabajar con 1 solo dato por ello es mejor usar otro tipo de codificación que es la BCD para transformar nuestro string a un valor decimal.
+### Forma BCD ###
