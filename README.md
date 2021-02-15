@@ -224,9 +224,12 @@ Los bits de banderas más comunes es:
 
 La tabla quedaría representada como:
 
-| Bandera       |    |    |    |    | O  | D  | I | T | S | Z |   | A |   | P |   | C |
+| Bandera       |  _X_  | _X_   | _X_   | _X_   | O  | D  | I | T | S | Z |  _X_ | A | _X_  | P | _X_  | C |
 | ------------- | -- | -- | -- | -- | -- | -- | - | - | - | - | - | - | - | - | - | - |
 | Número de bit | 15 | 14 | 13 | 12 | 11 | 10 | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+
+
+__X__: Sin uso
 ### Registros de Segmento ###
 Los segmentos son áreas específicas en un programa para contener datos, código y pila. Hay tres segmentos principales:
 * __Segmento de Código__ Contiene todas las instrucciones a ejecutar. Un registro de segmento de código de 16 bits o registro _CS_ almacena la dirección de inicio del segmento de código.
@@ -430,6 +433,7 @@ En algunas ocasiones _MOV_ puede tener algunas ambigüedades, las cuales se pued
 No está claro si desea mover un equivalente en bytes o un equivalente en palabra del número 110. En tales casos, es aconsejable utilizar un especificador de tipo.
 
 La siguiente tabla muestra algunos de los especificadores de tipo comunes:
+
 | Especificador de tipo | Bytes |
 | --------------------- | ----- |
 |          BYTE         |   1   |
@@ -487,6 +491,7 @@ Hay cinco formas básicas de la directiva define:
 |    DD     |       Palabra Doble     |   4   |
 |    DQ     |       Palabra Cuádruple |   8   |
 |    TB     |     Diez Bytes          |  10   |
+
 __Ejemplo__
 ```nasm
   selection   DB  'y'
@@ -506,6 +511,7 @@ Tenemos que considerar lo siguiente:
 Las directivas de reserva se utilizan para reservar espacio para datos no inicializados. Las directivas de reserva toman un solo operando que especifica el número de unidades de espacio que se reservarán. Cada define-directive tiene una reserve-directive relacionada.
 
 Hay cinco formas básicas de la directiva de reserva:
+
 | Directiva | Propósito de definición |
 | --------- | ----------------------- |
 |    RESB   |           Bytes         |
@@ -1075,6 +1081,7 @@ __Ejemplo__
 ```
 ## Instrucciones Lógicas ##
 El mismo procesador _x86_ que nos provee un set de instrucciones aritméticas, este igual nos puede proveer instrucciones que trabajan a nivel de bits y están son el set de instrucciones lógicas, las cuales son las siguientes:
+
 | Instrucción | Formato |
 | ----------- | ------- |
 | _AND_       | _AND_ operando1, operando2 |
@@ -1087,6 +1094,7 @@ El primer operando en todos los casos podría estar en registro o en memoria. El
 
 ### Instrucción AND ###
 Al igual que un sistema digital esta realiza la operación bit a bit y después este almacena su resultado en el primer registro de la operación:
+
 | Operandos | Valor en decimal | Valor binario |
 | --------- | ---------------- | ------------- |
 | Operando1 | 5                | 0101 |
@@ -1275,6 +1283,7 @@ __Ejemplo__
 Para estos casos el auxiliar _CMP_ puede realizar diversas operaciones de salto, por ello existen las siguientes instrucciones:
 
 __A continuación se muestran las instrucciones de salto condicional que se utilizan en datos con signo utilizados para operaciones aritméticas__
+
 | Instrucción | Descripción | Banderas |
 | ----------- | ----------- | -------- |
 | _JE_ / _JZ_ | Salta si es igual / Salta si es cero | _ZF_ |
@@ -1285,6 +1294,7 @@ __A continuación se muestran las instrucciones de salto condicional que se util
 | _JLE_ / _JNG_ | Salta si es menor o igual / Salta si no es estrictamente mayor | _OF_, _SF_, _ZF_ |
 
 __A continuación se muestran las instrucciones de salto condicional que se utilizan en datos sin firmar utilizados para operaciones lógicas__
+
 | Instrucciones | Descripción | Banderas |
 | ------------- | ----------- | -------- |
 | _JE_ / _JZ_ | Salta si es igual / Salta si es cero | _ZF_ |
@@ -1295,6 +1305,7 @@ __A continuación se muestran las instrucciones de salto condicional que se util
 | _JBE_ / _JNA_ | Salta debajo o igual / Salta no por encima | _AF_, _CF_ |
 
 __Las siguientes instrucciones de salto condicional tienen usos especiales y verifican el valor de las banderas__
+
 | Instrucciones | Descripción | Banderas |
 | ------------- | ----------- | -------- |
 |   _JXCZ_      | Salta si _CX_ es cero | Ninguna |
