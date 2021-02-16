@@ -2174,3 +2174,67 @@ Crea un archivo, escribe sobre el archivo y finalmente lee lo que hay en el arch
     mov   ebx,  0
     int   0x80
 ```
+## Gestión de Memoria
+
+El kernel proporciona la llamada al sistema _sys\_brk()_ para asignar memoria sin necesidad de moverla más tarde. Esta llamada asigna memoria justo detrás de la imagen de la aplicación en la memoria.
+
+* Esta función del sistema le permite configurar la dirección más alta disponible en la sección de datos.
+* Esta llamada al sistema toma un parámetro, que es la dirección de memoria más alta necesaria para configurar.
+  * Este valor se almacena en el registro _EBX_.
+  * En caso de cualquier error, _sys\_brk()_ devuelve _-1_ o devuelve el propio código de error negativo.
+
+__Ejemplo__
+```nasm
+  section .data
+    ; Definimos las salidas del programa stdout, stdin,
+    ; sys_exit, sys_read, sys_write, sys_open, sys_close,
+    ; sys_creat
+    stdout    equ 1
+    stdin     equ 0
+    sys_exit  equ 1
+    sys_read  equ 3
+    sys_write equ 4
+    sys_brk   equ 45
+
+    msg       db  "Se almacenaron 16kb!!",0x0A
+    lmsg      equ $-msg
+
+  section .text
+    global  _start
+
+  _start:
+    ; Crea el flujo
+    mov     eax,  sys_brk
+    xor     ebx,  ebx
+    int     0x80
+
+    ; Parte de la reserva
+    add     eax,  16384
+    mov     ebx,  eax
+    mov     eax,  sys_brk
+    int     0x80
+
+    cmp     eax,  0
+    jl      salir           ; Si hay error
+
+    mov     edi,  eax       ; edi = dirección más alta disponible
+    sub     edi,  4         ; Apuntando a la última DWORD
+    mov     ecx,  4096      ; número de DWORD asignados
+    xor     eax,  eax       ; Limpiando el registro eax
+    std                     ; Hacia atrás
+    rep     stosd           ; Repetir para toda el área asignada
+    cld                     ; Pone la bandera DF en estado normal
+
+    mov     eax,  sys_write
+    mov     ebx,  stdout
+    mov     ecx,  msg
+    mov     edx,  lmsg
+    int     0x80
+
+  salir:
+    mov     eax,  sys_exit
+    xor     ebx,  ebx
+    int     0x80
+```
+
+Eso es todo por el momento, Gracias.
