@@ -1614,3 +1614,77 @@ El prefijo _REP_ también tiene las siguientes variaciones:
 * _REPNE_ o _REPNZ_: También es repetición condicional. Repite la operación mientras la bandera de cero indica no igual / cero. Se detiene cuando _ZF_ indica igual / cero o cuando _CX_ se reduce a cero.
 
 ## Arreglos
+Como anteriormente podemos almacenar los datos de tal forma que tengamos variables individuales y en algunos casos del mismo tipo, pero en ocasiones podemos seccionar una variable con múltiples datos del mismo tipo, por tanto podemos realizar lo siguiente:
+```nasm
+  numeros dw  34, 45, 56, 67, 75, 89
+```
+De tal forma que la variable _numeros_ almacena 6 números de tipo _DW_ los cuales son equivalentes a 12 bytes en total de almacenamiento.
+
+Otra forma de igual almacenar datos con un dato inicializado de forma fija, puede ser la siguiente:
+```nasm
+  init_a  times 8 dw 0
+```
+Como vemos en este ejemplo creamos un arreglo de 8 casillas que almacenan 0 en todas sus posiciones, añadiendo que hacemos uso del tipo _DW_ por tanto almacenamos o usamos 16 bytes en total.
+
+__Ejemplo__
+```nasm
+  section .data
+    ; Definimos las salidas del programa std_out, std_in,
+    ; sys_write, sys_exit, sys_read
+    stdout    equ 1
+    stdin     equ 0
+    sys_exit  equ 1
+    sys_write equ 4
+    sys_read  equ 3
+    msg       db  "Resultado de la suma del array: "
+    endl      db  0x0a
+    lmsg      equ $-msg
+    lendl     equ $-endl
+    global x  ; Forma 3 de declarar un array
+      x:      db  2
+              db  4
+              db  3
+      sum:    db  0
+
+  section .text
+    global  _start
+
+  _start:
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg
+    mov edx,  lmsg
+    int 0x80
+
+    mov eax,  3       ; Número de bytes del array
+    mov ebx,  0       ; Registro que almacenara la suma
+    mov ecx,  x       ; Punto de inicio del arreglo
+
+  top:
+    add ebx,  [ecx]
+    add ecx,  1       ; Pasa a la siguiente posición
+    dec eax           ; Decrementa eax para verificar si es 0
+    jnz top
+
+  hecho:
+    add ebx,  '0'
+    mov [sum],ebx     ; Mueve el valor del registro ebx a sum
+
+  fin:
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  sum
+    mov edx,  1
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  endl
+    mov edx,  lendl
+    int 0x80
+
+    mov eax,  sys_exit
+    mov ebx,  0
+    int 0x80
+
+```
