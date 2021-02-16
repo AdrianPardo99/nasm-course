@@ -1995,6 +1995,7 @@ Los números estándar de algunos flujos de archivos son los siguientes:
 Especifica la ubicación para una operación de lectura / escritura posterior en el archivo en términos de bytes. Cada archivo se considera una secuencia de bytes. Cada archivo abierto está asociado con un puntero de archivo que especifica un desplazamiento en bytes, relativo al comienzo del archivo. Cuando se abre un archivo, el puntero del archivo se establece en cero.
 
 ### Llamadas al sistema para manejo de archivos
+
 | _eax_ | Nombre | _ebx_ | _ecx_ | _edx_ |
 | ----- | ------ | ----- | ----- | ----- |
 |   2   | sys\_fork | struct pt\_reg | - | - |
@@ -2079,7 +2080,8 @@ Crea un archivo, escribe sobre el archivo y finalmente lee lo que hay en el arch
 ```nasm
   section .data
     ; Definimos las salidas del programa stdout, stdin,
-    ; sys_exit, sys_read, sys_write, sys_open, sys_close, sys_creat
+    ; sys_exit, sys_read, sys_write, sys_open, sys_close,
+    ; sys_creat
     stdout    equ 1
     stdin     equ 0
     sys_exit  equ 1

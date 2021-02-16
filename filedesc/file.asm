@@ -1,6 +1,7 @@
 section .data
   ; Definimos las salidas del programa stdout, stdin,
-  ; sys_exit, sys_read, sys_write, sys_open, sys_close, sys_creat
+  ; sys_exit, sys_read, sys_write, sys_open, sys_close,
+  ; sys_creat
   stdout    equ 1
   stdin     equ 0
   sys_exit  equ 1
