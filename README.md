@@ -6,9 +6,9 @@ Este lenguaje de programación es compatible en Sistemas Operativos como Windows
 ## Indice de contenido
 
 1.  [ Ensamblador y secciones del mismo. ](#ensamblador)
-  1.  [ Sección data ](#data)
-  2.  [ Sección bss ](#bss)
-  3.  [ Sección text ](#text)
+    1.  [ Sección data ](#data)
+    2.  [ Sección bss ](#bss)
+    3.  [ Sección text ](#text)
 2.  [ Comentarios ](#coments)
 3.  [ Declaración ](#declare)
 4.  [ Sintaxis de declaraciones ](#syntax)
@@ -16,10 +16,60 @@ Este lenguaje de programación es compatible en Sistemas Operativos como Windows
 6.  [ Compilación y linkeo ](#compi)
 7.  [ Segmentos de memoria ](#segments)
 8.  [ Registros ](#registers)
-  1.  [ Datos ](#datareg)
-  2.  [ Apuntadores ](#pointerreg)
-  3.  [ Índice ](#indexreg)
-  4.  [ Segmento ](#segmentreg)
+    1.  [ Datos ](#datareg)
+    2.  [ Apuntadores ](#pointerreg)
+    3.  [ Índice ](#indexreg)
+    4.  [ Segmento ](#segmentreg)
+9.  [ Callsystem ](#callsys)
+10. [ Modos de direccionamiento ](#moddir)
+    1.  [ Memoria (Directo) ](#memdir)
+    2.  [ Compensación ](#comdir)
+    3.  [ Memoria (Indirecto) ](#memind)
+    4.  [ MOV ](#mov)
+11. [ Variables ](#variables)
+    1.  [ Asignación de espacio en datos inicializados ](#asvar)
+    2.  [ Asignación de espacio en datos no inicializados ](#nasvar)
+    3.  [ Múltiples definiciones ](#mulvar)
+    4.  [ Múltiples inicializaciones ](#mulinit)
+12. [ Constantes ](#constant)
+    1.  [ Directiva EQU ](#cequ)
+    2.  [ Directiva assing ](#cassing)
+    3.  [ Directiva define ](#cdefine)
+13. [ Instrucciones Aritméticas ](#arithm)
+    1.  [ INC ](#ainc)
+    2.  [ DEC ](#adec)
+    3.  [ ADD y SUB ](#aaddsub)
+    4.  [ MUL e IMUL ](#amul)
+    5.  [ DIV e IDIV ](#adiv)
+14. [ Instrucciones Lógicas ](#logic)
+    1.  [ AND ](#land)
+    2.  [ OR, XOR y NOT ](#lor)
+    3.  [ TEST ](#atest)
+15. [ Condicionales ](#conditional)
+    1.  [ CMP ](#ccmp)
+    2.  [ Saltos Incondicionales ](#cincond)
+    3.  [ Saltos Condicionales ](#ccond)
+16. [ Ciclos ](#loops)
+17. [ Números ](#numbers)
+    1.  [ ASCII ](#nascii)
+    2.  [ BCD ](#nbcd)
+18. [ Strings ](#str)
+    1.  [ Instrucciones ](#stri)
+    2.  [ Prefijos de repetición ](#strp)
+19. [ Arrays ](#arrays)
+20. [ Subrutinas ](#subrutines)
+    1.  [ Stack ](#stack)
+21. [ Recursión ](#recu)
+22. [ Macros ](#macros)
+23. [ Gestión de archivos ](#filemag)
+    1.  [ Apuntador de archivos ](#filpointer)
+    2.  [ Llamadas de sistema ](#filcall)
+    3.  [ Crear y abrir archivo ](#filopen)
+        1.  [ Leer ](#filread)
+        2.  [ Escribir ](#filwrite)
+        3.  [ Cerrar ](#filclose)
+        4.  [ Actualizar ](#filupdate)
+24. [ Gestión de Memoria ](#memmag)
 
 <a name="ensamblador"></a>
 ## Ensamblador y secciones del mismo
@@ -303,6 +353,8 @@ __Un ejemplo de uso de registros en general puede ser el siguiente:__
     len equ $ - msg                   ; Tamanio de msg
     s2  times 9 db  "*"               ; 9 veces *
 ```
+
+<a name="callsys"></a>
 ## Llamadas al Sistema
 Ahora bien el saber y conocer acerca de algunas llamadas al sistemas. Estas llamadas siguen diversos pasos necesarios para poder escribir, leer, abrir o cerrar descriptores de archivos.
 
@@ -386,6 +438,8 @@ __Ejemplo de uso de llamadas al sistema__
     mov ebx,  0                                     ; exit 0;
     int 0x80
 ```
+
+<a name="moddir"></a>
 ## Modos de direccionamiento
 La mayoría de las instrucciones requieren que se procesen operandos. Una dirección de operando proporciona la ubicación, donde se almacenan los datos a procesar. Algunas instrucciones no requieren un operando, mientras que otras instrucciones pueden requerir uno, dos o tres operandos.
 
@@ -406,6 +460,8 @@ __Ejemplo:__
   ADD BYTE_VALUE, 65  ; Un operando inmediato de suma
   MOV AX, 0x45        ; Constante inmediata 0x45 es transferida a AX
 ```
+
+<a name="memdir"></a>
 ### Direccionamiento de Memoria (Directo)
 Cuando los operandos se especifican en el modo de direccionamiento de memoria, se requiere acceso directo a la memoria principal, generalmente al segmento de datos. Esta forma de abordar da como resultado un procesamiento de datos más lento. Para localizar la ubicación exacta de los datos en la memoria, necesitamos la dirección de inicio del segmento, que normalmente se encuentra en el registro __DS__ y un valor de compensación. Este valor de compensación también se denomina dirección efectiva.
 
@@ -416,6 +472,8 @@ __Ejemplo:__
   ADD BYTE_VALUE, DL  ; Agrega el registro en la ubicación de la memoria
   MOV BX, BYTE_VALUE  ; El operando de la memoria se agrega al registro
 ```
+
+<a name="comdir"></a>
 #### Direccionamiento de Compensación (Directa)#
 Este modo de direccionamiento utiliza los operadores aritméticos para modificar una dirección. Por ejemplo, observe las siguientes definiciones que definen tablas de datos:
 
@@ -432,6 +490,8 @@ __Ejemplo:__
   MOV CX, WORD_TABLE[3]	  ; Obtiene el 4to elemento de la tabla de palabras
   MOV CX, WORD_TABLE + 3	; Obtiene el 4to elemento de la tabla de palabras
 ```
+
+<a name="memind"></a>
 ### Direccionamiento de Memoria (Indirecto)
 Este modo de direccionamiento utiliza la capacidad de la computadora de Segmento: direccionamiento de compensación . Generalmente, los registros base __EBX__, __EBP__ (o __BX__, __BP__) y los registros de índice (__DI__, __SI__), codificados entre corchetes para referencias de memoria, se utilizan para este propósito.
 
@@ -446,6 +506,8 @@ __Ejemplo__
   ADD EBX, 2              ; EBX = EBX +2
   MOV [EBX], 123          ; MY_TABLE[1] = 123
 ```
+
+<a name="mov"></a>
 ### Instrucción MOV
 __MOV__ se utiliza para mover datos de un espacio de almacenamiento a otro.
 
@@ -513,9 +575,12 @@ Un ejemplo de esta sección es la siguiente:
     msg db  "Luis Slobotzky ",0xA
     lMsg  equ $-msg
 ```
+
+<a name="variables"></a>
 ## Variables
 NASM proporciona varias directivas definidas para reservar espacio de almacenamiento para variables. La directiva define ensamblador se utiliza para la asignación de espacio de almacenamiento. Se puede utilizar para reservar e inicializar uno o más bytes.
 
+<a name="asvar"></a>
 ### Asignación de espacio de almacenamiento para datos inicializados
 La sintaxis de la declaración de asignación de almacenamiento para datos inicializados es:
 ```nasm
@@ -548,6 +613,8 @@ Tenemos que considerar lo siguiente:
 * El procesador utiliza el orden de bytes little-endian.
 * Los números negativos se convierten a su representación en complemento a 2
 * Los números de coma flotante cortos y largos se representan utilizando 32 o 64 bits, respectivamente.
+
+<a name="nasvar"></a>
 ### Asignación de espacio de almacenamiento para datos no inicializados
 Las directivas de reserva se utilizan para reservar espacio para datos no inicializados. Las directivas de reserva toman un solo operando que especifica el número de unidades de espacio que se reservarán. Cada define-directive tiene una reserve-directive relacionada.
 
@@ -561,6 +628,7 @@ Hay cinco formas básicas de la directiva de reserva:
 |    RESQ   |       Palabra Cuadruple |
 |    REST   |        10 Bytes         |
 
+<a name="mulvar"></a>
 ### Múltiples definiciones
 Puede tener varias declaraciones de definición de datos en un programa.
 
@@ -571,6 +639,8 @@ __Ejemplo__
   number2   DD  12345679  ; 123456789D = 0x75BCD15
 ```
 El ensamblador asigna memoria contigua para múltiples definiciones de variables.
+
+<a name="mulinit"></a>
 ### Múltiples inicializaciones
 La directiva __TIMES__ permite múltiples inicializaciones con el mismo valor. Por ejemplo, una matriz denominada marcas de tamaño 9 se puede definir e inicializar a cero utilizando la siguiente declaración:
 
@@ -605,12 +675,16 @@ La directiva _TIMES_ es útil para definir matrices y tablas. El siguiente progr
     mov ebx,  0
     int 0x80
 ```
+
+<a name="constant"></a>
 ## Constantes
 El ensamblador de NASM tiene la utilidad de crear y definir constantes las cuales son utilizadas en la escritura de programas, por ello existen tres distintas formas las cuales son llamadas por disintas directivas del lenguaje siendo las siguientes:
 * __EQU__
 * __\%assing__
 * __\%define__
 
+
+<a name="cequ"></a>
 ### Directiva EQU
 La directiva _EQU_ es usada para definir constantes las cuales comúnmente contienen números enteros.
 
@@ -678,6 +752,8 @@ __Un ejemplo programado puede ser el siguiente:__
     mov ebx,  0
     int 0x80
 ```
+
+<a name="cassing"></a>
 ### Directiva \%assing
 Parecida a _EQU_ para definir un valor numérico, pero a diferencia de _EQU_, esta directiva permite realizar redefinición de los valores más adelante.
 
@@ -694,6 +770,8 @@ Más tarde durante la ejecución podremos modificarlo:
   %assing total 20
 ```
 _Nota:_ Esta directiva es sensitiva a mayúsculas y minúsculas.
+
+<a name="cdefine"></a>
 ### Directiva \%define
 La directiva permite definir tanto constantes numéricas como de cadenas de caracteres. Esta directiva es similar a \#define en C.
 
@@ -709,9 +787,11 @@ _Importante respecto al ejemplo y al código de ejemplo:_
 * El código anterior reemplaza _PTR_ por [_EBP_ + 4].
 * Esta directiva también permite la redefinición y distingue entre mayúsculas y minúsculas.
 
+<a name="arithm"></a>
 ## Instrucciones Aritméticas
 Estas instrucciones te permiten manipular operaciones en los registros y variables dependiendo el caso, por otro lado esto nos permite realizar operaciones las cuales ayudan a solucionar 1 o más problemas, sea el curioso ejemplo de una calculadora.
 
+<a name="ainc"></a>
 ### Instrucción INC
 La instrucción _INC_ se utiliza para incrementar un operando en uno. Funciona en un solo operando que puede estar en un registro o en la memoria.
 
@@ -726,6 +806,8 @@ __Ejemplo__
   INC DL    ; Incremento del registro de 8 bits
   INC [con] ; Incremento de la variable con
 ```
+
+<a name="adec"></a>
 ### Instrucción DEC
 La instrucción _DEC_ se utiliza para reducir un operando en uno. Funciona en un solo operando que puede estar en un registro o en la memoria.
 
@@ -750,6 +832,8 @@ __Ejemplo__
     mov esi,  value
     dec byte  [esi]
 ```
+
+<a name="aaddsub"></a>
 ### Instrucción ADD y SUB
 Las instrucciones _ADD_ y _SUB_ se utilizan para realizar una simple suma / resta de datos binarios en tamaño de byte, palabra y palabra doble, es decir, para sumar o restar operandos de 8, 16 o 32 bits, respectivamente.
 
@@ -861,6 +945,8 @@ __Ejemplo__
     mov ebx,  0
     int 0x80
 ```
+
+<a name="amul"></a>
 ### Instrucción MUL e IMUL
 Hay dos instrucciones para multiplicar datos binarios. La instrucción _MUL_ (Multiplicar) maneja datos sin firmar y la _IMUL_ (Multiplicar enteros) maneja datos firmados. Ambas instrucciones afectan a la bandera de transporte y desbordamiento.
 
@@ -995,6 +1081,8 @@ __Ejemplo__
     mov ebx,  0
     int 0x80
 ```
+
+<a name="adiv"></a>
 ### Instrucción DIV e IDIV
 La operación de división genera dos elementos: un _cociente_ y un _residuo_. En caso de multiplicación, no se produce un desbordamiento porque se utilizan registros de doble longitud para mantener el producto. Sin embargo, en caso de división, puede producirse un desbordamiento. El procesador genera una interrupción si se produce un desbordamiento.
 
@@ -1120,6 +1208,8 @@ __Ejemplo__
     mov ebx,  0
     int 0x80
 ```
+
+<a name="logic"></a>
 ## Instrucciones Lógicas
 El mismo procesador _x86_ que nos provee un set de instrucciones aritméticas, este igual nos puede proveer instrucciones que trabajan a nivel de bits y están son el set de instrucciones lógicas, las cuales son las siguientes:
 
@@ -1133,6 +1223,7 @@ El mismo procesador _x86_ que nos provee un set de instrucciones aritméticas, e
 
 El primer operando en todos los casos podría estar en registro o en memoria. El segundo operando podría estar en el registro / memoria o en un valor inmediato (constante). Sin embargo, las operaciones de memoria a memoria no son posibles. Estas instrucciones comparan o hacen coincidir bits de los operandos y establecen las banderas _CF_, _OF_, _PF_, _SF_ y _ZF_.
 
+<a name="land"></a>
 ### Instrucción AND
 Al igual que un sistema digital esta realiza la operación bit a bit y después este almacena su resultado en el primer registro de la operación:
 
@@ -1243,6 +1334,8 @@ Aplicando esta idea en registros y programado el programa quedaría como el sigu
     mov ebx,  0
     int 0x80
 ```
+
+<a name="lor"></a>
 ### Intrucciones OR, XOR, NOT
 Para el caso de estas operaciones realizan las mismas operaciones bit a bit en las cuales el _operando1_ es el que se ve modificado de acuerdo a lo que este pueda necesitar.
 
@@ -1270,8 +1363,12 @@ __NOT__
   ; not 0101 = 1010 <=> 0xFF 0xFF 0xFF 0xFA
   ;   por el tamaño del registro 32 bits o 4 bytes
 ```
+
+<a name="atest"></a>
 ### Instrucción TEST
 La instrucción TEST funciona igual que la operación AND, pero a diferencia de la instrucción AND, no cambia el primer operando. Entonces, si necesitamos verificar si un número en un registro es par o impar, también podemos hacerlo usando la instrucción TEST sin cambiar el número original.
+
+<a name="conditional"></a>
 ## Condicionales
 La ejecución condicional en lenguaje ensamblador se logra mediante varias instrucciones de bucle y ramificación. Estas instrucciones pueden cambiar el flujo de control en un programa. La ejecución condicional se observa en dos escenarios:
 
@@ -1281,6 +1378,8 @@ La ejecución condicional en lenguaje ensamblador se logra mediante varias instr
 | Salto condicional   | Esto se realiza mediante un conjunto de instrucciones de salto j condición dependiendo de la condición. Las instrucciones condicionales transfieren el control rompiendo el flujo secuencial y lo hacen cambiando el valor de compensación en IP. |
 
 Por ello analizaremos la instrucción CMP.
+
+<a name="ccmp"></a>
 ### Instrucción CMP
 La instrucción CMP compara dos operandos. Generalmente se usa en ejecución condicional. Esta instrucción básicamente resta un operando del otro para comparar si los operandos son iguales o no. No perturba los operandos de origen o destino. Se utiliza junto con la instrucción de salto condicional para la toma de decisiones.
 
@@ -1304,6 +1403,8 @@ CMP se utiliza a menudo para comparar si un valor de contador ha alcanzado el n�
   CMP	EDX, 10	; Compara si el valor EDX esta en 10
   JLE	LP1     ; Si es menor igual a 10, salta a LP1
 ```
+
+<a name="cincond"></a>
 ### Saltos incondicionales
 Como se mencionó anteriormente, esto se realiza mediante la instrucción JMP. La ejecución condicional a menudo implica una transferencia de control a la dirección de una instrucción que no sigue la instrucción que se está ejecutando actualmente. La transferencia de control puede ser hacia adelante, para ejecutar un nuevo conjunto de instrucciones o hacia atrás, para volver a ejecutar los mismos pasos.
 
@@ -1320,6 +1421,8 @@ __Ejemplo__
   ; .
   JMP L1
 ```
+
+<a name="ccond"></a>
 ### Saltos condicionales
 Para estos casos el auxiliar _CMP_ puede realizar diversas operaciones de salto, por ello existen las siguientes instrucciones:
 
@@ -1359,6 +1462,7 @@ __Las siguientes instrucciones de salto condicional tienen usos especiales y ver
 |   _JS_        | Salta si Signo (Valor negativo) | _SF_ |
 |   _JNS_       | Salta sino Signo (Valor positivo) | _SF_ |
 
+<a name="loops"></a>
 ## Ciclos
 Muchas veces podemos utilizar las instrucciones _JMP_ para realizar diversos ciclos de una condición especifica.
 
@@ -1431,6 +1535,8 @@ l1:
   mov ebx,  0
   int 0x80
 ```
+
+<a name="numbers"></a>
 ## Números
 Los datos numéricos generalmente se representan en sistema binario. Las instrucciones aritméticas operan sobre datos binarios. Cuando los números se muestran en la pantalla o se ingresan desde el teclado, están en formato ASCII.
 
@@ -1441,6 +1547,7 @@ Sin embargo, tales conversiones tienen una sobrecarga y la programación en leng
 * ASCII
 * BCD (Binary Coded Decimal) (Decimal Codificado en Binario)
 
+<a name="nascii"></a>
 ### Forma ASCII
 En la representación ASCII, los números decimales se almacenan como una cadena de caracteres ASCII.
 
@@ -1546,6 +1653,7 @@ _start:
 ```
 Pero esto solo permite trabajar con 1 solo dato por ello es mejor usar otro tipo de codificación que es la BCD para transformar nuestro string a un valor decimal.
 
+<a name="nbcd"></a>
 ### Forma BCD
 Hay dos tipos de representación BCD:
 
@@ -1583,6 +1691,7 @@ Hay dos instrucciones para procesar estos números:
 
 No hay soporte para multiplicación y división en representación BCD empaquetada.
 
+<a name="str"></a>
 ## Strings (Cadenas de texto)
 
 Ya hemos utilizado cadenas de longitud variable en nuestros ejemplos anteriores. Las cadenas de longitud variable pueden tener tantos caracteres como sea necesario. Generalmente, especificamos la longitud de la cadena por cualquiera de las siguientes dos formas:
@@ -1610,6 +1719,7 @@ __Ejemplo__
 
 Entonces con esto procederemos a realizar las siguientes operaciones o a su análisis.
 
+<a name="stri"></a>
 ### Instrucciones de String
 
 Cada instrucción de cadena puede requerir un operando de origen, un operando de destino o ambos. Para segmentos de 32 bits, las instrucciones de cadena utilizan registros _ESI_ y _EDI_ para apuntar a los operandos de origen y destino, respectivamente.
@@ -1640,6 +1750,7 @@ La siguiente tabla representa la idea:
 | _CMPS_ | _DS_:_SI_ / _ES_:_DI_ | _CMPSB_ | _CMPSW_ | _CMPSD_ |
 | _SCAS_ | _ES_:_DI_ / _AX_ | _SCASB_ | _SCASW_ | _SCASD_ |
 
+<a name="strp"></a>
 ### Prefijos de repetición
 El prefijo _REP_, cuando se establece antes de una instrucción de cadena, por ejemplo, _REP_ _MOVSB_, provoca la repetición de la instrucción basada en un contador colocado en el registro _CX_. _REP_ ejecuta la instrucción, reduce _CX_ en 1 y comprueba si _CX_ es cero. Repite el procesamiento de la instrucción hasta que _CX_ sea cero.
 
@@ -1654,6 +1765,7 @@ El prefijo _REP_ también tiene las siguientes variaciones:
 * _REPE_ o _REPZ_: Es repetición condicional. Repite la operación mientras la bandera de cero indica igual / cero. Se detiene cuando _ZF_ indica no igual / cero o cuando _CX_ es cero.
 * _REPNE_ o _REPNZ_: También es repetición condicional. Repite la operación mientras la bandera de cero indica no igual / cero. Se detiene cuando _ZF_ indica igual / cero o cuando _CX_ se reduce a cero.
 
+<a name="arrays"></a>
 ## Arreglos
 Como anteriormente podemos almacenar los datos de tal forma que tengamos variables individuales y en algunos casos del mismo tipo, pero en ocasiones podemos seccionar una variable con múltiples datos del mismo tipo, por tanto podemos realizar lo siguiente:
 ```nasm
@@ -1729,6 +1841,7 @@ __Ejemplo__
     int 0x80
 ```
 
+<a name="subrutines"></a>
 ## Procedimientos o Subrutinas
 Los procedimientos o subrutinas son muy importantes en el lenguaje ensamblador, ya que los programas en lenguaje ensamblador tienden a ser de gran tamaño. Los procedimientos se identifican con un nombre. A continuación de este nombre, se describe el cuerpo del procedimiento que realiza un trabajo bien definido. El final del procedimiento se indica mediante una declaración de devolución.
 
@@ -1808,6 +1921,8 @@ __Ejemplo__
     mov ebx,  0
     int 0x80
 ```
+
+<a name="stack"></a>
 ### Estructra de datos Stack (Pila)
 Una pila es una estructura de datos similar a una matriz en la memoria en la que los datos se pueden almacenar y eliminar de una ubicación llamada 'parte superior' de la pila. Los datos que deben almacenarse se 'empujan' a la pila y los datos que se van a recuperar se 'extraen' de la pila. Stack es una estructura de datos LIFO, es decir, los datos almacenados primero se recuperan en último lugar.
 
@@ -1884,6 +1999,8 @@ __Ejemplo__
     loop    next
     ret
 ```
+
+<a name="recu"></a>
 ## Recursión
 Un procedimiento recursivo es aquel que se llama a sí mismo. Hay dos tipos de recursividad: directa e indirecta. En la recursividad directa, el procedimiento se llama a sí mismo y en la recursividad indirecta, el primer procedimiento llama a un segundo procedimiento, que a su vez llama al primer procedimiento.
 
@@ -1959,6 +2076,8 @@ __Ejemplo__
     mul     bl        ; ax = al*bl
     ret
 ```
+
+<a name="macros"></a>
 ## Macros
 Escribir una macro es otra forma de garantizar la programación modular en lenguaje ensamblador.
 
@@ -2015,6 +2134,8 @@ __Ejemplo__
     mov     ebx,  0
     int     0x80
 ```
+
+<a name="filemag"></a>
 ## Gestión de archivos
 El sistema considera cualquier dato de entrada o salida como flujo de bytes.
 
@@ -2032,9 +2153,11 @@ Los números estándar de algunos flujos de archivos son los siguientes:
 * stdout - 1
 * stderr - 2
 
+<a name="filpointer"></a>
 ### Apuntador de archivos
 Especifica la ubicación para una operación de lectura / escritura posterior en el archivo en términos de bytes. Cada archivo se considera una secuencia de bytes. Cada archivo abierto está asociado con un puntero de archivo que especifica un desplazamiento en bytes, relativo al comienzo del archivo. Cuando se abre un archivo, el puntero del archivo se establece en cero.
 
+<a name="filcall"></a>
 ### Llamadas al sistema para manejo de archivos
 
 | _eax_ | Nombre | _ebx_ | _ecx_ | _edx_ |
@@ -2056,6 +2179,7 @@ Los pasos necesarios para utilizar las llamadas al sistema son los mismos, como 
 
 La llamada al sistema devuelve el descriptor de archivo del archivo creado en el registro EAX, en caso de error, el código de error está en el registro EAX.
 
+<a name="filopen"></a>
 ### Crear y abrir un archivo
 Para crear y abrir un archivo, realice lo siguiente:
 * Ponga la llamada al sistema _sys\_open()_ _5_, en el registro _EAX_.
@@ -2071,6 +2195,7 @@ Entre los modos de acceso a archivos, los más utilizados son:
 * Solo escritura (1)
 * Lectura-escritura (2)
 
+<a name="filread"></a>
 #### Leer de un archivo
 Para leer algo desde un archivo se hace lo siguiente:
 
@@ -2081,6 +2206,7 @@ Para leer algo desde un archivo se hace lo siguiente:
 
 La llamada al sistema devuelve el número de bytes leídos en el registro EAX, en caso de error, el código de error está en el registro EAX.
 
+<a name="filwrite"></a>
 #### Escribir en un archivo
 Para escribir en un archivo se hace lo siguiente:
 
@@ -2091,6 +2217,7 @@ Para escribir en un archivo se hace lo siguiente:
 
 La llamada al sistema devuelve el número real de bytes escritos en el registro _EAX_, en caso de error, el código de error está en el registro _EAX_.
 
+<a name="filclose"></a>
 #### Cerrar un archivo
 Para cerrar el flujo del archivo se hace lo siguiente:
 
@@ -2099,6 +2226,7 @@ Para cerrar el flujo del archivo se hace lo siguiente:
 
 La llamada al sistema devuelve, en caso de error, el código de error en el registro _EAX_.
 
+<a name="filupdate"></a>
 #### Para actualizar en un archivo
 Para actualizar en un archivo se hace lo siguiente:
 
@@ -2215,6 +2343,8 @@ Crea un archivo, escribe sobre el archivo y finalmente lee lo que hay en el arch
     mov   ebx,  0
     int   0x80
 ```
+
+<a name="memmag"></a>
 ## Gestión de Memoria
 
 El kernel proporciona la llamada al sistema _sys\_brk()_ para asignar memoria sin necesidad de moverla más tarde. Esta llamada asigna memoria justo detrás de la imagen de la aplicación en la memoria.
@@ -2278,4 +2408,4 @@ __Ejemplo__
     int     0x80
 ```
 
-Eso es todo por el momento, Gracias.
+__Eso es todo por el momento, Gracias.__
