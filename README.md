@@ -1686,5 +1686,235 @@ __Ejemplo__
     mov eax,  sys_exit
     mov ebx,  0
     int 0x80
+```
 
+## Procedimientos o Subrutinas
+Los procedimientos o subrutinas son muy importantes en el lenguaje ensamblador, ya que los programas en lenguaje ensamblador tienden a ser de gran tamaño. Los procedimientos se identifican con un nombre. A continuación de este nombre, se describe el cuerpo del procedimiento que realiza un trabajo bien definido. El final del procedimiento se indica mediante una declaración de devolución.
+
+__Sintaxis__
+```nasm
+  procedimiento:
+    ; Estructura del procedimiento
+    ret
+```
+
+El procedimiento se llama desde otra función utilizando la instrucción _CALL_. La instrucción _CALL_ debe tener el nombre del procedimiento llamado como argumento como se muestra a continuación:
+
+```nasm
+  call procedimiento
+```
+
+El procedimiento llamado devuelve el control al procedimiento de llamada utilizando la instrucción _RET_.
+
+__Ejemplo__
+```nasm
+  section .data
+    ; Definimos las salidas del programa std_out, std_in,
+    ; sys_write, sys_exit, sys_read
+    stdout    equ 1
+    stdin     equ 0
+    sys_exit  equ 1
+    sys_write equ 4
+    sys_read  equ 3
+    msg       db  "Resultado de la suma del array: "
+    endl      db  0x0a
+    lmsg      equ $-msg
+    lendl     equ $-endl
+    global x  ; Forma 3 de declarar un array
+      x:      db  2
+              db  4
+              db  3
+      sum:    db  0
+
+  section .text
+    global  _start
+
+  _start:
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  msg
+    mov edx,  lmsg
+    int 0x80
+
+    mov eax,  3       ; Número de bytes del array
+    mov ebx,  0       ; Registro que almacenara la suma
+    mov ecx,  x       ; Punto de inicio del arreglo
+
+  top:
+    add ebx,  [ecx]
+    add ecx,  1       ; Pasa a la siguiente posición
+    dec eax           ; Decrementa eax para verificar si es 0
+    jnz top
+
+  hecho:
+    add ebx,  '0'
+    mov [sum],ebx     ; Mueve el valor del registro ebx a sum
+
+  fin:
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  sum
+    mov edx,  1
+    int 0x80
+
+    mov eax,  sys_write
+    mov ebx,  stdout
+    mov ecx,  endl
+    mov edx,  lendl
+    int 0x80
+
+    mov eax,  sys_exit
+    mov ebx,  0
+    int 0x80
+```
+### Estructra de datos Stack (Pila)
+Una pila es una estructura de datos similar a una matriz en la memoria en la que los datos se pueden almacenar y eliminar de una ubicación llamada 'parte superior' de la pila. Los datos que deben almacenarse se 'empujan' a la pila y los datos que se van a recuperar se 'extraen' de la pila. Stack es una estructura de datos LIFO, es decir, los datos almacenados primero se recuperan en último lugar.
+
+NASM proporciona dos instrucciones para las operaciones de pila: _PUSH_ y _POP_. Estas instrucciones tienen sintaxis como:
+
+```nasm
+  push  operando
+  pop   dirección/registro
+```
+
+El espacio de memoria reservado en el segmento de la pila se utiliza para implementar la pila. Los registros _SS_ y _ESP_ (o _SP_) se utilizan para implementar la pila. La parte superior de la pila, que apunta al último elemento de datos insertado en la pila, es apuntada por el registro _SS_: _ESP_, donde el registro _SS_ apunta al comienzo del segmento de la pila y el _SP_ (o _ESP_) da el desplazamiento en el segmento de pila.
+
+La implementación de la pila tiene las siguientes características:
+
+* Solo se pueden guardar palabras o palabras dobles en la pila, no un byte.
+* La pila crece en la dirección inversa, es decir, hacia la dirección de memoria inferior
+* La parte superior de la pila apunta al último elemento insertado en la pila; apunta al byte más bajo de la última palabra insertada.
+
+Como comentamos sobre el almacenamiento de los valores de los registros en la pila antes de usarlos para algún uso; se puede hacer de la siguiente manera
+
+```nasm
+  ; Guarda los registros AX y BX en la pila
+  push  ax
+  push  bx
+
+  ; Usa los registros para otro proposito
+  mov   ax, valor1
+  mov   bx, valor2
+  ; .....
+  mov   valor1, ax
+  mov   valor2, bx
+
+  ; Devuelve a los valores originales
+  pop   bx
+  pop   ax
+```
+
+__Ejemplo__
+```nasm
+  section .data
+    ; Definimos las salidas del programa std_out, std_in,
+    ; sys_write, sys_exit, sys_read
+    stdout    equ 1
+    stdin     equ 0
+    sys_exit  equ 1
+    sys_write equ 4
+    sys_read  equ 3
+    achar     db '0'
+
+  section .text
+    global  _start
+
+  _start:
+    call    display
+    mov     eax,  sys_exit
+    mov     ebx,  0
+    int     0x80
+
+  display:
+    mov     ecx,  256
+
+  next:
+    push    ecx
+    mov     eax,  sys_write
+    mov     ebx,  stdout
+    mov     ecx,  achar
+    mov     edx,  1
+    int     0x80
+
+    pop     ecx
+    mov     dx,   [achar]
+    cmp     byte [achar],0x0D
+    inc     byte [achar]
+    loop    next
+    ret
+```
+## Recursión
+Un procedimiento recursivo es aquel que se llama a sí mismo. Hay dos tipos de recursividad: directa e indirecta. En la recursividad directa, el procedimiento se llama a sí mismo y en la recursividad indirecta, el primer procedimiento llama a un segundo procedimiento, que a su vez llama al primer procedimiento.
+
+La recursividad se pudo observar en numerosos algoritmos matemáticos.
+
+__Ejemplo__
+
+Considere el caso de calcular el factorial de un número. El factorial de un número viene dado por la ecuación:
+```nasm
+  Fact(n) = n * Fact(n-1) for (n>0)
+```
+
+__Ejemplo__
+```nasm
+  section .data
+    ; Definimos las salidas del programa std_out, std_in,
+    ; sys_write, sys_exit, sys_read
+    stdout    equ 1
+    stdin     equ 0
+    sys_exit  equ 1
+    sys_write equ 4
+    sys_read  equ 3
+    msg       db  "El factorial de 3 es: "
+    endl      db  0x0a
+    lmsg      equ $-msg
+    lendl     equ $-endl
+
+  section .bss
+    fact   resb  1
+
+  section .text
+    global  _start
+
+
+  _start:
+    mov     bx, 3     ; Para el calculo del factorial de 3
+    call factorial
+    add     ax, '0'
+    mov     [fact],ax
+
+    mov     eax,  sys_write
+    mov     ebx,  stdout
+    mov     ecx,  msg
+    mov     edx,  lmsg
+    int     0x80
+
+    mov     eax,  sys_write
+    mov     ebx,  stdout
+    mov     ecx,  fact
+    mov     edx,  1
+    int     0x80
+
+    mov     eax,  sys_write
+    mov     ebx,  stdout
+    mov     ecx,  endl
+    mov     edx,  lendl
+    int     0x80
+
+    mov     eax,  sys_exit
+    mov     ebx,  0
+    int     0x80
+
+  factorial:
+    cmp     bl, 1
+    jg      calcula
+    mov     ax, 1
+    ret
+
+  calcula:
+    dec     bl
+    call    factorial
+    inc     bl
+    mul     bl        ; ax = al*bl
+    ret
 ```

@@ -8,7 +8,7 @@ all: ${BIN}
 %.o:%.asm
 	${ASM} ${FLAGS} $<
 
-${BIN} &: ${OBJ}
+${BIN}: %:%.o
 	ld -m elf_i386 $< -s -o $@
 
 clean:
