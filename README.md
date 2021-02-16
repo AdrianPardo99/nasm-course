@@ -1974,3 +1974,201 @@ __Ejemplo__
     mov     ebx,  0
     int     0x80
 ```
+## Gestión de archivos
+El sistema considera cualquier dato de entrada o salida como flujo de bytes.
+
+Hay tres flujos de archivos estándar:
+
+* Entrada estándar (stdin)
+* Salida estándar (stdout)
+* Error estándar (stderr)
+
+### Descriptor de archivo
+Un descriptor de archivo es un entero de 16 bits asignado a un archivo como una identificación de archivo. Cuando se crea un archivo nuevo o se abre un archivo existente, el descriptor de archivo se utiliza para acceder al archivo.
+
+Los números estándar de algunos flujos de archivos son los siguientes:
+* stdin - 0
+* stdout - 1
+* stderr - 2
+
+### Apuntador de archivos
+Especifica la ubicación para una operación de lectura / escritura posterior en el archivo en términos de bytes. Cada archivo se considera una secuencia de bytes. Cada archivo abierto está asociado con un puntero de archivo que especifica un desplazamiento en bytes, relativo al comienzo del archivo. Cuando se abre un archivo, el puntero del archivo se establece en cero.
+
+### Llamadas al sistema para manejo de archivos
+| _eax_ | Nombre | _ebx_ | _ecx_ | _edx_ |
+| ----- | ------ | ----- | ----- | ----- |
+|   2   | sys\_fork | struct pt\_reg | - | - |
+|   3   | sys\_read | unsigned int | char * | size\_t |
+|   4   | sys\_write | unsigned int | const char * | size_t |
+|   5   | sys\_open | const char * | int | int |
+|   6   | sys\_close | unsigned int   | - | - |
+|   8   | sys\_creat | const char * | int | - |
+|   19  | sys\_lseek | unsigned int | off\_t | unsigned int |
+
+Los pasos necesarios para utilizar las llamadas al sistema son los mismos, como comentamos anteriormente:
+
+* Ponga el número de llamada del sistema en el registro _EAX_.
+* Almacene los argumentos de la llamada al sistema en los registros _EBX_, _ECX_, etc.
+* Llame a la interrupción correspondiente (_0x80_).
+* El resultado generalmente se devuelve en el registro _EAX_.
+
+La llamada al sistema devuelve el descriptor de archivo del archivo creado en el registro EAX, en caso de error, el código de error está en el registro EAX.
+
+### Crear y abrir un archivo
+Para crear y abrir un archivo, realice lo siguiente:
+* Ponga la llamada al sistema _sys\_open()_ _5_, en el registro _EAX_.
+* Ponga el nombre del archivo en el registro _EBX_.
+* Ponga el modo de acceso a archivos en el registro _ECX_.
+* Ponga los permisos del archivo en el registro _EDX_.
+
+La llamada al sistema devuelve el descriptor de archivo del archivo creado en el registro _EAX_, en caso de error, el código de error está en el registro _EAX_.
+
+Entre los modos de acceso a archivos, los más utilizados son:
+
+* Solo lectura (0)
+* Solo escritura (1)
+* Lectura-escritura (2)
+
+#### Leer de un archivo
+Para leer algo desde un archivo se hace lo siguiente:
+
+* Ponga la llamada al sistema _sys\_read()_ número _3_, en el registro _EAX_.
+* Coloque el descriptor de archivo en el registro _EBX_.
+* Ponga el puntero al búfer de entrada en el registro _ECX_.
+* Coloque el tamaño del búfer, es decir, el número de bytes a leer, en el registro _EDX_.
+
+La llamada al sistema devuelve el número de bytes leídos en el registro EAX, en caso de error, el código de error está en el registro EAX.
+
+#### Escribir en un archivo
+Para escribir en un archivo se hace lo siguiente:
+
+* Ponga la llamada al sistema _sys\_write()_ número _4_, en el registro _EAX_.
+* Coloque el descriptor de archivo en el registro _EBX_.
+* Coloque el puntero en el búfer de salida en el registro _ECX_.
+* Coloque el tamaño del búfer, es decir, el número de bytes a escribir, en el registro _EDX_.
+
+La llamada al sistema devuelve el número real de bytes escritos en el registro _EAX_, en caso de error, el código de error está en el registro _EAX_.
+
+#### Cerrar un archivo
+Para cerrar el flujo del archivo se hace lo siguiente:
+
+* Ponga la llamada al sistema _sys\_close()_ número _6_, en el registro _EAX_.
+* Coloque el descriptor de archivo en el registro _EBX_.
+
+La llamada al sistema devuelve, en caso de error, el código de error en el registro _EAX_.
+
+#### Para actualizar en un archivo
+Para actualizar en un archivo se hace lo siguiente:
+
+* Ponga la llamada al sistema _sys\_lseek()_ número _19_, en el registro _EAX_.
+* Coloque el descriptor de archivo en el registro _EBX_.
+* Ponga el valor de compensación en el registro _ECX_.
+* Ponga la posición de referencia para el desplazamiento en el registro _EDX_.
+
+__Las posiciones de referencia son las siguientes__
+
+* Comienzo del archivo - valor _0_
+* Posición actual - valor _1_
+* Fin de archivo - valor _2_
+
+La llamada al sistema devuelve, en caso de error, el código de error en el registro _EAX_.
+
+__Ejemplo__
+
+Crea un archivo, escribe sobre el archivo y finalmente lee lo que hay en el archivo.
+```nasm
+  section .data
+    ; Definimos las salidas del programa stdout, stdin,
+    ; sys_exit, sys_read, sys_write, sys_open, sys_close, sys_creat
+    stdout    equ 1
+    stdin     equ 0
+    sys_exit  equ 1
+    sys_read  equ 3
+    sys_write equ 4
+    sys_open  equ 5
+    sys_close equ 6
+    sys_creat equ 8
+
+    read_only equ 0
+    write_onl equ 1
+    read_wr   equ 2
+
+    beg       equ 0
+    current   equ 1
+    eof       equ 2
+
+    fil_name  db  "archivo.txt",0
+    msg_file  db  "Hola mundo desde el archivo.",0x0A
+    lmsg_file equ $-msg_file
+    msg       db  "Mensaje del archivo: ",0x0A
+    lmsg      equ $-msg
+
+  section .bss
+    fd_in  resb  1
+    fd_out resb  1
+    lect   resb  29
+
+  section .text
+    global  _start
+
+  _start:
+    ; Creando el archivo
+    mov   eax,  sys_creat
+    mov   ebx,  fil_name
+    mov   ecx,  0777      ; Permisos de escritura, lectura y ejecución
+    int   0x80
+
+    mov [fd_out], eax
+
+    ; Escribiendo en el archivo
+    mov   eax,  sys_write
+    mov   ebx,  [fd_out]
+    mov   ecx,  msg_file
+    mov   edx,  lmsg_file
+    int   0x80
+
+    ; Cerrando el flujo
+    mov   eax,  sys_close
+    mov   ebx,  [fd_out]
+    int   0x80
+
+    ; Escribiendo el mensaje de pantalla
+    mov   eax,  sys_write
+    mov   ebx,  stdout
+    mov   ecx,  msg
+    mov   edx,  lmsg
+    int   0x80
+
+    ; Abrimos el flujo para el archivo
+    mov   eax,  sys_open
+    mov   ebx,  fil_name
+    mov   ecx,  read_only
+    mov   edx,  0777
+    int   0x80
+
+    mov [fd_in],eax
+
+    ; Leemos lo que hay en el archivo
+    mov   eax,  sys_read
+    mov   ebx,  [fd_in]
+    mov   ecx,  lect
+    mov   edx,  29
+    int 0x80
+
+    ; Cerramos el flujo de datos
+    mov   eax,  sys_close
+    mov   ebx,  [fd_in]
+    int 0x80
+
+    ; Mostramos en pantalla el contenido
+    mov   eax,  sys_write
+    mov   ebx,  stdout
+    mov   ecx,  lect
+    mov   edx,  29
+    int   0x80
+
+    ; Cerramos programa
+    mov   eax,  sys_exit
+    mov   ebx,  0
+    int   0x80
+```
