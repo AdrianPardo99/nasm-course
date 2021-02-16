@@ -6,6 +6,20 @@ Este lenguaje de programación es compatible en Sistemas Operativos como Windows
 ## Indice de contenido
 
 1.  [ Ensamblador y secciones del mismo. ](#ensamblador)
+  1.  [ Sección data ](#data)
+  2.  [ Sección bss ](#bss)
+  3.  [ Sección text ](#text)
+2.  [ Comentarios ](#coments)
+3.  [ Declaración ](#declare)
+4.  [ Sintaxis de declaraciones ](#syntax)
+5.  [ Hello World ](#hello)
+6.  [ Compilación y linkeo ](#compi)
+7.  [ Segmentos de memoria ](#segments)
+8.  [ Registros ](#registers)
+  1.  [ Datos ](#datareg)
+  2.  [ Apuntadores ](#pointerreg)
+  3.  [ Índice ](#indexreg)
+  4.  [ Segmento ](#segmentreg)
 
 <a name="ensamblador"></a>
 ## Ensamblador y secciones del mismo
@@ -15,6 +29,7 @@ Un programa de ensamblador es dividido en tres secciones
 * Sección bss
 * Sección text
 
+<a name="data"></a>
 ### Sección data
 
 Es usado para declarar constantes o datos inicializados. Estos datos no cambian durante la ejecución. Se puede declarar varios valores constantes, nombre de archivo, tamaño de un buffer, entre otras cosas.
@@ -23,6 +38,8 @@ La sintaxis para declarar la sección de data es:
 ```nasm
   section .data
 ```
+
+<a name="bss"></a>
 ### Sección bss
 
 Es usado para declarar variables.
@@ -31,6 +48,8 @@ La sintaxis para declarar la sección de bss es:
 ```nasm
   section .bss
 ```
+
+<a name="text"></a>
 ### Sección text
 Es usado para guardar el código actual. Esa sección debe comenzar con la declaración __global _start__, la cual le dice al kernel donde comienza la ejecución del programa.
 
@@ -40,6 +59,8 @@ La sintaxis para declarar la sección de text es:
     global _start
   _start:
 ```
+
+<a name="coments"></a>
 ## Comentarios
 Si bien esto puede ser o no relevante el como escribir comentarios en Nasm, es importante que la escritura de los mismos en ensamblador te ayudan mucho para saber que estas haciendo en el lenguaje.
 
@@ -50,6 +71,8 @@ __Ejemplo__
 ```nasm
   add eax ebx  ; adds ebx a eax
 ```
+
+<a name="declare"></a>
 ## Declaración de Lenguaje Ensamblador
 Los programas en lenguaje ensamblador constan de tres tipos de declaraciones
 * Instrucciones o instrucciones ejecutables
@@ -62,6 +85,7 @@ __Las directivas de ensamblador o pseudo-operaciones__ le da información al ens
 
 __Macros__ son básicamente un mecanismo de sustitución de texto.
 
+<a name="syntax"></a>
 ## Sintaxis de declaraciones en Lenguaje Ensamblador
 El formato del lenguaje es el siguiente:
 ```nasm
@@ -87,6 +111,7 @@ Siguiendo la receta de cocina, el ejemplo:
   MOV AL, 10          ; Transfiere el valor 10 al registro AL
 ```
 
+<a name="hello"></a>
 ## Hola mundo
 Un ejemplo claro del lenguaje ensamblador es el clasico Hola mundo:
 ```nasm
@@ -107,6 +132,7 @@ Un ejemplo claro del lenguaje ensamblador es el clasico Hola mundo:
   len equ $ - msg               ; Tamanio del string
 ```
 
+<a name="compi"></a>
 ## Compilar y linkear un programa Ensamblador en NASM
 A continuación te muestro como se guarda un archivo en Nasm y como linkear el archivo para este se vuelva un binario
 
@@ -121,6 +147,8 @@ __Importante__
   # Procederemos a linkear
   ld -m elf_i386 <file>.o -s -o <nombre-binario>
 ```
+
+<a name="segments"></a>
 ## Segmentos de memoria
 El modelo de memoria segmentada divide la memoria del sistema en grupos de segmentos independientes referenciados por punteros ubicados en el registro de segmento. Cada segmento se utiliza para contener un tipo de dato específico. Un segmento se utiliza para contener códigos de instrucciones, otro segmento almacena los elementos de datos y un tercer segmento mantiene la pila del programa.
 
@@ -138,6 +166,8 @@ Entonces:
       * Esta también es un área fija.
 * __Pila__
   * Este segmento contiene valores de datos pasados a funciones y procedimientos dentro del programa.
+
+<a name="registers"></a>
 ## Registros
 El hecho de que se puedan realizar operaciones en el procesador implica el realizar un procesamiento de los datos. Estos datos ocasionalmente se pueden almacenar en memoria y se puede acceder a ellos desde un registro. Sin embargo, leer datos y almacenarlos en la memoria ralentiza el procesador, ya que implica procesos complicados de enviar la solicitud a través del bus de control y obtener los datos a través del mismo canal.
 
@@ -154,6 +184,7 @@ Existen 10 registros de procesador de 32 bits y 6 registros en la arquitectura I
 * Registros de Control.
 * Registros de Segmento.
 
+<a name="datareg"></a>
 ### Registros de Datos
 4 Registros de 32 bits son usados para Aritmética, Lógica y otras operaciones. Esos registros de 32 bits pueden ser usados de 3 maneras:
 * Como un registro datos completo de 32 bits:
@@ -180,6 +211,8 @@ Por lo que estos registros cuentan con un propósito especifico que es el siguie
 * __BX__ es conocido como el registro base, ya que puede utilizarse para usar direccionamiento indexado.
 * __CX__ es conocido como el registro contador, ya que los registros _ECX_, _CX_ almacenan el contador para bucles en operaciones iterativas.
 * __DX__ es conocido como el registro de datos. También se utiliza en operaciones de entrada/salida.También se usa con el registro _AX_ junto con _DX_ para multiplicar y dividir operaciones que involucran valores grandes.
+
+<a name="pointerreg"></a>
 ### Registros de Apuntadores
 El registro de apuntadores son registros de 32 bits son:
 * __EIP__
@@ -197,6 +230,7 @@ De los cuales hay tres categorías de registros de apuntadores, los cuales son:
 * __Apuntador de Pila__ _Stack Pointer (SP)_ El registro _SP_ de 16 bits provee el valor dentro de la pila de programa. _SP_ en asociación con el registro _SS_ (SS: SP) se refiere a la posición actual de los datos o la dirección dentro de la pila de programa.
 * __Apuntador de Base__ _Base Pointer (BP)_ El registro _BS_ de 16 bits ayuda principalmente a hacer referencia a las variables de parámetro que se pasan a subrutina. La dirección en el registro _SS_ se combina con el desplazamiento en _BP_ para obtener la ubicación del parámetro. _BP_ también se puede combinar con los registros _DI_, _SI_ como registro base para direccionamiento especial.
 
+<a name="indexreg"></a>
 ### Registros de Índice
 Los registros de índice 32 bits son:
 * __ESI__
@@ -235,6 +269,8 @@ La tabla quedaría representada como:
 
 
 __X__: Sin uso
+
+<a name="segmentreg"></a>
 ### Registros de Segmento
 Los segmentos son áreas específicas en un programa para contener datos, código y pila. Hay tres segmentos principales:
 * __Segmento de Código__ Contiene todas las instrucciones a ejecutar. Un registro de segmento de código de 16 bits o registro _CS_ almacena la dirección de inicio del segmento de código.
