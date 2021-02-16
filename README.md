@@ -4,8 +4,10 @@ NASM es un lenguaje de bajo nivel, tambien conocido como lenguaje ensamblador, e
 Este lenguaje de programación es compatible en Sistemas Operativos como Windows y Linux. (Como escritor lo estoy programando y trabajando sobre un sistema Linux)
 
 ## Indice de contenido
-1.  [Ensamblador y secciones del mismo](#Primer parte)
 
+1.  [ Ensamblador y secciones del mismo. ](#ensamblador)
+
+<a name="ensamblador"></a>
 ## Ensamblador y secciones del mismo
 Un programa de ensamblador es dividido en tres secciones
 
